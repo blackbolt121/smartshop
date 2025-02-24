@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 @Service
 @RequiredArgsConstructor
+
 public class AuthService {
 
     private final TokenRepository tokenRepository;
