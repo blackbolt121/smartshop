@@ -1,6 +1,8 @@
 package com.smartshop.smartshop.Controllers;
 
+import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.AuthService;
+import com.smartshop.smartshop.Services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -9,14 +11,22 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Logger;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+
 public class AuthController {
 
     private final AuthService service;
+    @Autowired
+    private final UserRepository userRepository;
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@RequestBody RegisterRequest request) {
+
+        if(userRepository.findByEmail(request.email()).isPresent()){
+            return ResponseEntity.badRequest().build();
+        }
         final TokenResponse response = service.register(request);
         return ResponseEntity.ok(response);
     }
@@ -35,6 +45,7 @@ public class AuthController {
     ) {
         return service.refreshToken(authentication);
     }
+
 
 
 
