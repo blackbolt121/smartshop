@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RequestMapping(path = "/rest/api/1/producto")
 @RestController
 public class ProductController {
