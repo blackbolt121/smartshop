@@ -1,4 +1,4 @@
-import { Button, Card, Typography } from '@mui/joy';
+import { Button, Typography } from '@mui/joy';
 import { ProductCard } from './ProductCard';
 import { useEffect } from 'react';
 import axios from 'axios';
@@ -16,8 +16,6 @@ const LandingPage = () => {
             })
             let productRequest = await axios.get("http://localhost:8080/rest/api/1/producto", {
                 headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
                     "Authorization": `Bearer ${getAccessToken()}`
                 }
             })
