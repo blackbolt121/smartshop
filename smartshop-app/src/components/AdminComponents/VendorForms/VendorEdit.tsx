@@ -6,15 +6,29 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../store/store';
 import { updateVendor, setVendors } from "../../../store/store";
 import { Vendor } from '../../../store/store';
+import { useNavigate } from 'react-router-dom';
+
 
 export const VendorEdit = () => {
-    
+
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        console.log(getAccessToken())
+        if (getAccessToken() === null) {
+            if (!(location.href.includes("login") || location.href.includes("signup"))) {
+                navigate("/login")
+            }
+        }
+
+    }, [getAccessToken()])
+
     const vendors = useSelector((state: RootState) => state.vendors);
     const dispatch = useDispatch();
 
     const [vendorList, setVendorList] = useState<Vendor[]>([]);
     const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
-    
+
     const [vendorName, setVendorName] = useState('');
     const [vendorEmail, setVendorEmail] = useState('');
     const [vendorPhone, setVendorPhone] = useState('');
@@ -94,7 +108,7 @@ export const VendorEdit = () => {
             vendorWebsiteUrl,
             vendorFaxUrl,
         };
-        
+
         try {
             const response = await axios.put(`http://localhost:8080/rest/api/1/vendor/${selectedVendor.vendorId}`, updatedVendor, {
                 headers: {
@@ -117,10 +131,10 @@ export const VendorEdit = () => {
     return (
         <div>
             <FormLabel>Vendor List</FormLabel>
-            <Select onChange={(event, value) => {
+            <Select name='vendor' onChange={(event, value) => {
                 const vendor = vendorList.find(v => v.vendorId === value);
                 setSelectedVendor(vendor || null);
-            }}> 
+            }}>
                 {vendorList.map(vendor => (
                     <Option key={vendor.vendorId} value={vendor.vendorId}>{vendor.vendorName}</Option>
                 ))}
@@ -130,7 +144,7 @@ export const VendorEdit = () => {
                 <FormControl required sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <div>
                         <FormLabel htmlFor='vendor-name'>Vendor Name</FormLabel>
-                        <Input type='text' placeholder='Vendor Name' name='vendor-name' required 
+                        <Input type='text' placeholder='Vendor Name' name='vendor-name' required
                             value={vendorName} onChange={e => setVendorName(e.target.value)} />
                     </div>
 

@@ -1,6 +1,14 @@
 // src/store.ts
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+
+export type Product = {
+  id: number,
+  name: string,
+  price: number,
+  description: string,
+  vendor: Vendor
+}
 export type Vendor  = {
   "vendorId": string,
   "vendorName": string,
