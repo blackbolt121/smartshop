@@ -22,18 +22,37 @@ public class VendorController {
     @Autowired
     private final VendorRepository vendorRepository;
 
-    @GetMapping
-    public ResponseEntity<String> getVendor(@PathVariable String vendorId) {
-        Optional<Vendor> vendor = vendorRepository.findById(vendorId);
-        return vendor.map(value -> ResponseEntity.ok(value.toString())).orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping(path = "all")
+    public ResponseEntity<List<VendorResponse>> getAllVendors() {
+        log.info("Get all vendors");
+
+        List<VendorResponse> vendorResponses = vendorRepository.findAll()
+                .stream()
+                .map(vendor -> new VendorResponse(
+                        vendor.getVendorId(),
+                        vendor.getVendorName(),
+                        vendor.getVendorEmail(),
+                        vendor.getVendorPhone(),
+                        vendor.getVendorAddress(),
+                        vendor.getVendorCity(),
+                        vendor.getVendorState(),
+                        vendor.getVendorZipCode(),
+                        vendor.getVendorPostalCode(),
+                        vendor.getVendorWebsite(),
+                        vendor.getVendorWebsite(),
+                        vendor.getVendorFaxUrl()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(vendorResponses);
     }
 
-    @GetMapping(path = "/all")
-    public ResponseEntity<List<Vendor>> getAllVendors() {
-        log.info("Get all vendors");
-        List<Vendor> vendors = vendorRepository.findAll();
-        return ResponseEntity.ok(vendors); // Devuelve un único array JSON
+    @PostMapping
+    public ResponseEntity<String> createVendor(@RequestBody Vendor vendor) {
+        vendorRepository.save(vendor);
+        String id = vendor.getVendorId();
 
+        return ResponseEntity.status(201).body(String.format("{\"id\": \"%s\"}", id));
     }
 
     @PutMapping(path = "{vendorId}")
@@ -52,18 +71,12 @@ public class VendorController {
         }
     }
 
-    @DeleteMapping
+    @DeleteMapping(path = "{vendorId}")
     public ResponseEntity<String> deleteVendor(@PathVariable String vendorId) {
         Optional<Vendor> vendor = vendorRepository.findById(vendorId);
         vendor.ifPresent(vendorRepository::delete);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping
-    public ResponseEntity<String> createVendor(@RequestBody Vendor vendor) {
-        vendorRepository.save(vendor);
-        String id = vendor.getVendorId();
 
-        return ResponseEntity.status(201).body(String.format("{\"id\": \"%s\"}", id));
-    }
 }

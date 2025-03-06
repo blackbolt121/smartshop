@@ -1,42 +1,59 @@
-import { useState } from "react";
-import { Button, Typography, Sheet, IconButton } from "@mui/joy";
+import { useEffect, useState } from "react";
+import { Button, Sheet, IconButton } from "@mui/joy";
 import { Menu, Close } from "@mui/icons-material";
-import { Link, redirect, useNavigate } from "react-router-dom";
-import logo from "../assets/smarshop.png"
+import { Link, useNavigate } from "react-router-dom";
+import logo from "../assets/coaim-transparent.png" //"../assets/smarshop.png"
 import { getAccessToken } from "../store/auth";
-import axios from "axios";
+
 
 
 
 const Navbar = () => {
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const [token, setToken] = useState<string>("")
+  const [logText, setLogText] = useState<string>("Log In")
 
   const toggleMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  useEffect(()=>{
+    setToken(getAccessToken() || "")
+  }, [getAccessToken()])
+  
+  useEffect(()=>{
+    setToken(getAccessToken() || "")
+  }, [])
+
+  useEffect(()=>{
+    if(token){
+      setLogText("Log out")
+    }else{
+      setLogText("Sign In")
+    }
+  }, [token])
 
   return (
     <nav className="bg-blue-500 shadow-md">
       <div className="max-w-screen-xl mx-auto px-4 py-5 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-3">
-          <img src={logo} width={100} />
-          <Typography level="h4" sx={{ fontWeight: "bold", color: "white" }}>
-            Smartshop
-          </Typography>
+          <img src={logo} width={200} />
         </div>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-8 text-white md:items-center md:justify-center">
-          <Link to="/" className="hover:text-indigo-200 transition-colors">Home</Link>
-          <Link to="/about" className="hover:text-indigo-200 transition-colors">About</Link>
-          <Link to="/contact" className="hover:text-indigo-200 transition-colors">Contact</Link>
+          <Link to="/" className="hover:text-indigo-200 transition-colors font-bold">Home</Link>
+          <Link to="/about" className="hover:text-indigo-200 transition-colors font-bold">About</Link>
+          <Link to="/contact" className="hover:text-indigo-200 transition-colors font-bold">Contact</Link>
+          <Link to="/tienda" className="hover:text-indigo-200 transition-colors font-bold">Tienda</Link>
           <Button variant="outlined" sx={{ color: "white" }} className="text-white hover:bg-white hover:text-black" onClick={async () => {
             if (getAccessToken()) {
               localStorage.removeItem("access_token")
               localStorage.removeItem("refresh_token")
-              let request = await axios.post("http://localhost:4000/auth/logout")
+              //let request = await axios.post("http://localhost:8080/auth/logout")
               console.log(getAccessToken())
               navigate("/logout")
             }else {
@@ -44,10 +61,10 @@ const Navbar = () => {
             }
             
           }}>
-            {getAccessToken() ? "Log Out" : "Log In"}
+            {logText}
           </Button>
         </div>
-
+          
         {/* Mobile Menu Icon */}
         <div className="md:hidden">
           <IconButton onClick={toggleMenu} color="neutral">
@@ -63,17 +80,19 @@ const Navbar = () => {
             <Link to={"/"} className="hover:text-indigo-200 transition-colors">Home</Link>
             <Link to="/about" className="hover:text-indigo-200 transition-colors">About</Link>
             <Link to="/contact" className="hover:text-indigo-200 transition-colors">Contact</Link>
+            <Link to="/tienda" className="hover:text-indigo-200 transition-colors">Tienda</Link>
             <Button variant="outlined" sx={{ color: "white" }} className="text-white hover:bg-white hover:text-black" onClick={async () => {
               if (getAccessToken()) {
                 localStorage.removeItem("access_token")
                 localStorage.removeItem("refresh_token")
-                let request = await axios.post("http://localhost:4000/auth/logout")
+                setToken("")
+                //let request = await axios.post("http://localhost:4000/auth/logout")
                 navigate("/logout")
               }else {
                 navigate("/login")
               }
             }}>
-              {getAccessToken() ? "Log Out" : "Log In"}
+              {logText}
             </Button>
           </div>
         </Sheet>

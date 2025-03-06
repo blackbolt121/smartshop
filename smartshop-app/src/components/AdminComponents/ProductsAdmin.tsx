@@ -1,28 +1,36 @@
-//A component called ProductsAdmin is being created. This component will be used to display the products that are available in the store. The component will be used in the admin panel of the application. The component will be used to display the products that are available in the store
-
-import { Box, Typography } from '@mui/material';
-import Sidebar from './SideBar';
-import ProductList from './ProductList';
-import { Button, FormControl, FormLabel, Input } from '@mui/joy';
-
-
+import { Box, Typography, TabList, Tab, TabPanel, Tabs } from "@mui/joy";
+import Sidebar from "./SideBar";
+import ProductList from "./ProductList"; // Asumiendo que existe
+import { ProductCreate } from "./ProductForms/ProductCreate";
+import { ProductEdit } from "./ProductForms/ProductEdit";
 
 export const ProductsAdmin = () => {
     return (
         <div className="flex">
             <Sidebar />
-            <div className="p-1">
+            <div className="w-full p-1">
                 <Box>
-                    <Typography variant="h4">Products</Typography>
-                    <Box sx={{marginBottom: 2}}>
-                        
-                    </Box>
-                    <Box>
-                        <ProductList />
+                    <Typography level="h4" sx={{ textAlign: "center", my: 2 }}>Products</Typography>
+                    <Box sx={{ marginBottom: 2, width: "100%" }}>
+                        <Tabs aria-label="Product Tabs" defaultValue={0}>
+                            <TabList>
+                                <Tab>Edit</Tab>
+                                <Tab>Create</Tab>
+                                <Tab>List</Tab>
+                            </TabList>
+                            <TabPanel value={0}>
+                                <ProductEdit />
+                            </TabPanel>
+                            <TabPanel value={1}>
+                                <ProductCreate />
+                            </TabPanel>
+                            <TabPanel value={2}>
+                                <ProductList />
+                            </TabPanel>
+                        </Tabs>
                     </Box>
                 </Box>
             </div>
-
         </div>
     );
-}
+};

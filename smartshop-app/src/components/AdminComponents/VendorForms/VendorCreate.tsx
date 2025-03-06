@@ -2,13 +2,16 @@ import { Button, FormControl, FormLabel, Input } from '@mui/joy';
 import axios from 'axios';
 import React from 'react';
 import { getAccessToken } from '../../../store/auth';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const handleAddVendor = async (e: any) => {
     e.preventDefault();
 
     console.log('Add Vendor');
 
-    const formData = new FormData(e.target as HTMLFormElement);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
     const vendorData = {
         vendorName: formData.get('vendor-name') as string,
         vendorEmail: formData.get('vendor-email') as string,
@@ -30,7 +33,7 @@ const handleAddVendor = async (e: any) => {
         Authorization: 'Bearer ' + getAccessToken(),
     })
     try {
-        const response = await axios.post('http://localhost:8080/rest/api/1/vendors', vendorData, {
+        const response = await axios.post('http://localhost:8080/rest/api/1/vendor', vendorData, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -45,22 +48,37 @@ const handleAddVendor = async (e: any) => {
         }
 
         console.log('Vendor creado con éxito:', vendorData);
+
+        form.reset();
     } catch (error) {
         console.error('Error al enviar la solicitud:', error);
     }
 }
 
 export const VendorCreate = () => {
+
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        console.log(getAccessToken())
+        if (getAccessToken() === null) {
+            if (!(location.href.includes("login") || location.href.includes("signup"))) {
+                navigate("/login")
+            }
+        }
+
+    }, [getAccessToken()])
+
     return (
         <div>
             <form onSubmit={handleAddVendor}>
-                <FormControl sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                    
+                <FormControl sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
                     <div>
                         <FormLabel required htmlFor='vendor-name'>Vendor Name</FormLabel>
                         <Input type='text' placeholder='Vendor Name' name='vendor-name' required />
                     </div>
-                    
+
                     <div>
                         <FormLabel required htmlFor='vendor-email'>Vendor Email</FormLabel>
                         <Input type='email' placeholder='Vendor Email' name='vendor-email' required />
@@ -70,12 +88,12 @@ export const VendorCreate = () => {
                         <FormLabel required htmlFor='vendor-phone'>Vendor Phone</FormLabel>
                         <Input type='tel' placeholder='Vendor Phone' name='vendor-phone' required />
                     </div>
-                    
+
                     <div>
                         <FormLabel required htmlFor='vendor-address'>Vendor Address</FormLabel>
                         <Input type='text' placeholder='Vendor Address' name='vendor-address' required />
                     </div>
-                    
+
                     <div>
                         <FormLabel htmlFor='vendor-city'>Vendor City</FormLabel>
                         <Input type='text' placeholder='Vendor City' name='vendor-city' required />
@@ -90,7 +108,7 @@ export const VendorCreate = () => {
                         <FormLabel htmlFor='vendor-zip-code'>Vendor Zip Code</FormLabel>
                         <Input type='number' placeholder='Vendor Zip Code' name='vendor-zip-code' required />
                     </div>
-                    
+
                     <div>
                         <FormLabel htmlFor='vendor-postal-code'>Vendor Postal Code</FormLabel>
                         <Input type='number' placeholder='Vendor Postal Code' name='vendor-postal-code' required />

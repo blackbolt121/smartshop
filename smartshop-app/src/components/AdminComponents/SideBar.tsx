@@ -10,20 +10,27 @@ export const Sidebar = () => {
         backgroundColor: 'gray.800',
         color: 'white',
       }}
-      className="h-dvh bg-blue-400"
+      className="h-screen bg-slate-800 text-white"
     >
-      <List>
+      <List sx={{ color: 'white' }}>
         <ListItem>
-          <ListItemButton component={Link} to="/admin/vendors">
+          <ListItemButton 
+            component={Link} 
+            to="/admin/vendors"
+            sx={{ color: 'white', '&:hover': { color: 'black' } }} // Apply MUI styling
+          >
             <ListItemContent>Vendors</ListItemContent>
           </ListItemButton>
         </ListItem>
         <ListItem>
-          <ListItemButton component={Link} to="/admin/products">
+          <ListItemButton 
+            component={Link} 
+            to="/admin/products" 
+            sx={{ color: 'white', '&:hover': { color: 'black' } }} // Consistent hover effect
+          >
             <ListItemContent>Products</ListItemContent>
           </ListItemButton>
         </ListItem>
-        {/* Agrega más opciones según sea necesario */}
       </List>
     </Box>
   );
