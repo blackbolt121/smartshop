@@ -38,7 +38,7 @@ jobs:
             docker build -t $DOCKERHUB_USERNAME/smartshop:latest .
       - run:
           name: Iniciar sesión en Docker Hub
-          command: echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          command: echo "$DOCKERHUB_PASSWORD" | docker login --username "$DOCKERHUB_USERNAME" --password-stdin
       - run:
           name: Etiquetar la imagen
           command: |
