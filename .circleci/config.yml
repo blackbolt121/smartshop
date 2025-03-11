@@ -47,15 +47,9 @@ jobs:
           name: Iniciar sesión en Docker Hub
           command: echo $DOCKERHUB_TOKEN | docker login -u rego199903 --password-stdin
       - run:
-          name: Etiquetar la imagen
-          command: |
-            TAG=$(git rev-parse --short HEAD)
-            docker tag rego199903/smartshop:latest rego199903/smartshop:$TAG
-      - run:
           name: Subir imagen a Docker Hub
           command: |
             docker push rego199903/smartshop:latest
-            docker push rego199903/smartshop:$TAG
 
 workflows:
   version: 2
