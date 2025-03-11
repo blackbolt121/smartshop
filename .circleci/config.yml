@@ -26,7 +26,6 @@ jobs:
           root: .
           paths:
             - build/libs/*.jar
-
   docker_build:
     executor: docker-executor
     steps:
