@@ -26,20 +26,25 @@ jobs:
           root: .
           paths:
             - build/libs/*.jar
+
   docker_build:
     executor: docker-executor
+    docker:
+      - image: cimg/python:3.9
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - setup_remote_docker
       - run:
-          name: Iniciar sesion en Docker Hub
+          name: Iniciar sesión en Docker Hub
           command: echo $DOCKERHUB_TOKEN | docker login -u rego199903 --password-stdin
       - run:
           name: Build Docker image
           command: |
             docker build -t rego199903/smarshop:latest .
       - run:
-          name: Verificar imágenes locales
+          name: List docker images
           command: docker images
       - run:
           name: Subir imagen a Docker Hub
