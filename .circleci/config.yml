@@ -6,7 +6,7 @@ executors:
       - image: cimg/openjdk:21.0  # Usa OpenJDK 21 con Gradle
         auth:
           username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+          password: $DOCKERHUB_TOKEN
 
 jobs:
   build:
@@ -29,23 +29,19 @@ jobs:
 
   docker_build:
     executor: docker-executor
-    docker:
-      - image: cimg/python:3.9
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
-      - attach_workspace:
-          at: .
       - setup_remote_docker
+      - run:
+          name: Iniciar sesion en Docker Hub
+          command: echo $DOCKERHUB_TOKEN | docker login -u rego199903 --password-stdin
       - run:
           name: Build Docker image
           command: |
             docker build -t rego199903/smarshop:latest .
       - run:
-          name: Iniciar sesión en Docker Hub
-          command: echo $DOCKERHUB_TOKEN | docker login -u rego199903 --password-stdin
+          name: Verificar imágenes locales
+          command: docker images
       - run:
           name: Subir imagen a Docker Hub
           command: |
