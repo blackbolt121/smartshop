@@ -31,6 +31,9 @@ jobs:
     executor: docker-executor
     docker:
       - image: cimg/python:3.9
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_TOKEN
     steps:
       - checkout
       - attach_workspace:
@@ -42,7 +45,7 @@ jobs:
       - run:
           name: Build Docker image
           command: |
-            docker build -t rego199903/smarshop:latest .
+            docker build -t rego199903/smartshop:latest .
       - run:
           name: List docker images
           command: docker images
