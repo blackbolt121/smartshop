@@ -1,11 +1,18 @@
-import { Button, Card, Typography } from '@mui/joy';
+import { Button, Typography } from '@mui/joy';
 import { ProductCard } from './ProductCard';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { getAccessToken } from '../store/auth';
+import { Product } from '../store/store';
+import { useState } from 'react';
+import ImageCarousel from './ImageCarousel';
+
 const LandingPage = () => {
 
+    const [products, setProducts] = useState<Product[]>([])
     async function loadProducts() {
+
+        
         console.log(`Bearer ${getAccessToken()}`)
 
         try{
@@ -14,10 +21,8 @@ const LandingPage = () => {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${getAccessToken()}`
             })
-            let productRequest = await axios.get("http://localhost:8080/rest/api/1/producto", {
+            let productRequest = await axios.get("http://localhost:8080/rest/api/1/producto/all", {
                 headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
                     "Authorization": `Bearer ${getAccessToken()}`
                 }
             })
@@ -29,7 +34,7 @@ const LandingPage = () => {
             }
     
             console.log(productRequest.data)
-    
+            setProducts(productRequest.data)
             console.log("Products loaded")
         }catch(error){
             console.log("Error fetching products")
@@ -53,18 +58,30 @@ const LandingPage = () => {
                 <Typography level="body-lg" sx={{ color: "white" }}>Configura tu lista</Typography>
                 <Button variant="solid" color="primary" className="mt-4">Compara ahora</Button>
             </header>
+            
+            <br />
+            <div className='w-full p-4 bg-white shadow-lg flex flex-col '>
+                <Typography level="h2" className="text-center mt-4">Top Productos</Typography>
+                <section className="flex justify-center items-center flex-wrap gap-y-2 gap-x-2 mt-4">
+                    {
+                        products.slice(0,5).map((product: Product) => <ProductCard id={product.id} name={product.name} description={product.description} price={product.price} key={product.id} />)
+                    }
+                </section>
+            </div>
 
-            {/* Product Section */}
-            <section className="flex justify-center items-center flex-wrap gap-y-2 gap-x-2 mt-4">
-                <ProductCard name="Product 1" price={99.99} description="Product Description" />
-                <ProductCard name="Product 2" price={199.99} description="Product Description" />
-                <ProductCard name="Product 3" price={299.99} description="Product Description" />
-                <ProductCard name="Product 4" price={399.99} description="Product Description" />
-                <ProductCard name="Product 5" price={499.99} description="Product Description" />
-                <ProductCard name="Product 6" price={599.99} description="Product Description" />
-            </section>
+            <div className='flex flex-col my-10 gap-10'>
+                <div>
+                    <Typography level="h1" className="text-center mt-4">Todo lo que necesites en un solo lugar</Typography>
+                </div>
+                <section>
+                    <ImageCarousel />
+                </section>
+                <div>
+                    <Typography level="h1" className="text-center mt-4">Las mejores marcas y proveedores a tu disposicion</Typography>
+                </div>
+            </div>
 
-            {/* Footer */}
+            {/* Footer */}  
 
         </div>
     );
