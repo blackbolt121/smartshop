@@ -1,5 +1,7 @@
 package com.smartshop.smartshop.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Vendor {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -28,6 +31,7 @@ public class Vendor {
     private String vendorWebsite;
     private String vendorWebsiteUrl;
     private String vendorFaxUrl;
-    @OneToMany(mappedBy = "vendor", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "vendor", fetch = FetchType.EAGER)
+    @JsonIgnore
     private List<Producto> productoList;
 }
