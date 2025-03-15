@@ -2,24 +2,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# Configuración para la aplicación Amplify (frontend)
-resource "aws_amplify_app" "frontend" {
-  name        = "smartshop-frontend"
-  repository  = "https://github.com/blackbolt121/smarshop-frontend"
-  oauth_token = ""
-
-  enable_auto_branch_creation = true
-  enable_branch_auto_build    = true
-  auto_branch_creation_config {
-    enable_auto_build = true
-  }
-}
-
-resource "aws_amplify_branch" "main" {
-  app_id      = aws_amplify_app.frontend.id
-  branch_name = "main"
-}
-
 # Creación del VPC
 resource "aws_vpc" "my_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -238,7 +220,7 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 resource "aws_instance" "my_ec2" {
-  ami             = "ami-0b07d00527cd28de4"
+  ami             = "ami-0786ff44e8544f0c3"
   instance_type   = "t2.micro"
   key_name        = "eks-key"
   network_interface {
@@ -256,6 +238,34 @@ resource "aws_instance" "my_ec2" {
   depends_on = [aws_db_instance.mariadb, aws_route53_zone.private_zone, aws_route53_record.database_alias]
 }
 
+
+# Configuración para la aplicación Amplify (frontend)
+resource "aws_amplify_app" "frontend" {
+  name        = "smartshop-frontend"
+  repository  = "https://github.com/blackbolt121/smarshop-frontend"
+  oauth_token = ""
+
+  enable_auto_branch_creation = true
+  enable_branch_auto_build    = true
+  environment_variables = {
+    VITE_API_BASE_URL = "http://${aws_eip_association.eip_assoc.public_ip}:8080"
+  }
+  auto_branch_creation_config {
+    enable_auto_build = true
+  }
+  depends_on = [aws_instance.my_ec2]
+}
+
+resource "aws_amplify_branch" "main" {
+  app_id      = aws_amplify_app.frontend.id
+  branch_name = "main"
+  depends_on = [aws_instance.my_ec2]
+}
+
+output "public_ip" {
+  value = aws_eip_association.eip_assoc.public_ip
+}
+
 output "database_address" {
   value = aws_db_instance.mariadb.address
 }
@@ -266,8 +276,4 @@ output "amplify_url" {
 
 output "ec2_private_ip" {
   value = aws_instance.my_ec2.private_ip
-}
-
-output "ec2_public_ip" {
-  value = aws_instance.my_ec2.public_ip
 }
