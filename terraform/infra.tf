@@ -220,7 +220,7 @@ resource "aws_eip_association" "eip_assoc" {
 }
 
 resource "aws_instance" "my_ec2" {
-  ami             = "ami-0786ff44e8544f0c3"
+  ami             = "ami-0750ef5b8e0f9106e"
   instance_type   = "t2.micro"
   key_name        = "eks-key"
   network_interface {
@@ -238,12 +238,43 @@ resource "aws_instance" "my_ec2" {
   depends_on = [aws_db_instance.mariadb, aws_route53_zone.private_zone, aws_route53_record.database_alias]
 }
 
+resource "aws_api_gateway_rest_api" "smartshop_api" {
+  name        = "smartshop-api"
+  description = "API Gateway que funciona como proxy para EC2"
+}
+
+resource "aws_api_gateway_resource" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.smartshop_api.id
+  parent_id   = aws_api_gateway_rest_api.smartshop_api.root_resource_id
+  path_part   = "/"  # Captura todas las rutas
+}
+
+resource "aws_api_gateway_method" "proxy_method" {
+  rest_api_id   = aws_api_gateway_rest_api.smartshop_api.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "proxy_integration" {
+  rest_api_id             = aws_api_gateway_rest_api.smartshop_api.id
+  resource_id             = aws_api_gateway_resource.proxy.id
+  http_method             = aws_api_gateway_method.proxy_method.http_method
+  integration_http_method = "ANY"
+  type                    = "HTTP_PROXY"
+  uri                     = "http://${aws_instance.my_ec2.public_ip}:8080" # Redirige a EC2
+}
+
+resource "aws_api_gateway_deployment" "smartshop_api_deployment" {
+  depends_on = [aws_api_gateway_integration.proxy_integration]
+  rest_api_id = aws_api_gateway_rest_api.smartshop_api.id
+}
 
 # Configuración para la aplicación Amplify (frontend)
 resource "aws_amplify_app" "frontend" {
   name        = "smartshop-frontend"
   repository  = "https://github.com/blackbolt121/smarshop-frontend"
-  oauth_token = ""
+  oauth_token = "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"
 
   enable_auto_branch_creation = true
   enable_branch_auto_build    = true
@@ -255,6 +286,9 @@ resource "aws_amplify_app" "frontend" {
   }
   depends_on = [aws_instance.my_ec2]
 }
+
+
+
 
 resource "aws_amplify_branch" "main" {
   app_id      = aws_amplify_app.frontend.id
