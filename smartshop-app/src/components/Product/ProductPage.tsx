@@ -26,7 +26,7 @@ export const ProductPage = () => {
 
         setTimeout(() => {
             setProduct(response.data)
-        }, 4000)
+        }, 500)
         /*
         const productData = await axios.get(`https://localhost:8080/producto/${id}`, {
             headers:{
@@ -57,7 +57,7 @@ export const ProductPage = () => {
     return <>
         {product ? <div className="grid grid-cols-[30%_70%] my-10 w-[80%] mx-auto">
             <div className="flex justify-center items-center w-full">
-                <img alt="productImage" src={logo} className="w-[90%]" />
+                <img alt="productImage" src={product.imageUrl} className="w-[90%]" />
             </div>
             <div className="flex flex-col p-1">
                 <Typography level="h4">

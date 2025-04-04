@@ -15,15 +15,15 @@ public class ProductoService {
     public List<Producto> getAllProducts(){
         return productRepository.findAll();
     }
-    public Optional<Producto> getProduct(Long id){
-        return productRepository.findById(id);
+    public Optional<Producto> getProduct(String id){
+        return productRepository.findById(id );
     }
     public Producto saveProduct(Producto producto){
         productRepository.save(producto);
         return producto;
     }
 
-    public void deleteProduct(Long id){
+    public void deleteProduct(String id){
         productRepository.deleteById(id);
     }
 }

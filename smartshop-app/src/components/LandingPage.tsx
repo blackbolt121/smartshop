@@ -6,10 +6,13 @@ import { getAccessToken } from '../store/auth';
 import { Product } from '../store/store';
 import { useState } from 'react';
 import ImageCarousel from './ImageCarousel';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
 
     const [products, setProducts] = useState<Product[]>([])
+    const navigate = useNavigate()
+
     async function loadProducts() {
 
         
@@ -21,7 +24,7 @@ const LandingPage = () => {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${getAccessToken()}`
             })
-            let productRequest = await axios.get("http://localhost:8080/rest/api/1/producto/all", {
+            let productRequest = await axios.get("http://localhost:8080/rest/api/1/producto/top", {
                 headers: {
                     "Authorization": `Bearer ${getAccessToken()}`
                 }
@@ -56,7 +59,9 @@ const LandingPage = () => {
             <header className="bg-blue-600 text-white p-6 text-center">
                 <Typography level="h3" sx={{ color: "white" }}>Compara miles de productos y sus precios, y toma la mejor decision</Typography>
                 <Typography level="body-lg" sx={{ color: "white" }}>Configura tu lista</Typography>
-                <Button variant="solid" color="primary" className="mt-4">Compara ahora</Button>
+                <Button variant="solid" color="primary" className="mt-4" onClick={()=>{
+                    navigate("/tienda")
+                }}>Compara ahora</Button>
             </header>
             
             <br />
@@ -64,7 +69,7 @@ const LandingPage = () => {
                 <Typography level="h2" className="text-center mt-4">Top Productos</Typography>
                 <section className="flex justify-center items-center flex-wrap gap-y-2 gap-x-2 mt-4">
                     {
-                        products.slice(0,5).map((product: Product) => <ProductCard id={product.id} name={product.name} description={product.description} price={product.price} key={product.id} />)
+                        products.slice(0,5).map((product: Product) => <ProductCard id={product.id} name={product.name} description={product.description} price={product.price} key={product.id} imageUrl={product.imageUrl}/>)
                     }
                 </section>
             </div>

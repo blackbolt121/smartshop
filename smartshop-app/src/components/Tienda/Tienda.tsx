@@ -35,8 +35,8 @@ export const Tienda = () => {
                     return;
                 }
                 console.log(productRequest.data);
-                setProducts(productRequest.data);
-                setFilteredProducts(productRequest.data);
+                setProducts(productRequest.data.slice(0,50));
+                setFilteredProducts(productRequest.data.slice(0,50));
                 console.log("Products loaded");
             } catch (error) {
                 console.log("Error fetching products");
@@ -160,9 +160,9 @@ export const Tienda = () => {
                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         >
                             <Option value="">Todas</Option>
-                            <Option value="brand1">Marca 1</Option>
-                            <Option value="brand2">Marca 2</Option>
-                            <Option value="brand3">Marca 3</Option>
+                            {[...new Set(products.map(product => product.vendor?.vendorName))].map(vendorName => (
+                                <Option key={vendorName} value={vendorName}>{vendorName}</Option>
+                            ))}
                         </Select>
                     </div>
                 </div>

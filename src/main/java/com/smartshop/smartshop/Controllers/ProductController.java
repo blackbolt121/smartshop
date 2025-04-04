@@ -2,6 +2,7 @@ package com.smartshop.smartshop.Controllers;
 
 
 import com.smartshop.smartshop.Models.Producto;
+import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.Services.ProductoService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class ProductController {
 
     @Autowired
     private ProductoService service;
+    @Autowired
+    private ProductRepository productRepository;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> createProduct(@RequestBody Producto producto){
@@ -57,9 +60,12 @@ public class ProductController {
         }
 
     }
-
+    @GetMapping(path = "top")
+    public ResponseEntity<List<Producto>> getTopProducts(){
+        return ResponseEntity.ok(productRepository.findRandomProducts());
+    }
     @GetMapping(path = "{producto}")
-    public ResponseEntity<Producto> getProduct(@PathVariable Long producto){
+    public ResponseEntity<Producto> getProduct(@PathVariable String producto){
         Producto product = service.getProduct(producto).orElse(null);
         if(product != null){
             return ResponseEntity.ok().body(product);
@@ -68,7 +74,7 @@ public class ProductController {
     }
 
     @PutMapping(path = "{producto}")
-    public ResponseEntity<String> updateProduct(@PathVariable Long producto, @RequestBody Producto updatedProduct){
+    public ResponseEntity<String> updateProduct(@PathVariable String producto, @RequestBody Producto updatedProduct){
 
 
         Producto search = service.getProduct(producto).orElse(null);
