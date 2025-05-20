@@ -12,5 +12,5 @@
 }
 
 .animate-scroll {
-    animation: scroll 30s linear infinite alternate;
+    animation: scroll 2s linear infinite alternate;
 }

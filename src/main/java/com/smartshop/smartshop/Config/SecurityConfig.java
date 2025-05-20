@@ -56,7 +56,14 @@ public class SecurityConfig {
                         req
                                 .requestMatchers(HttpMethod.OPTIONS)
                                 .permitAll()
-                                .requestMatchers("/auth/register", "/auth/login", "/auth/refresh-token", "/health")
+                                .requestMatchers("/auth/register",
+                                        "/auth/login",
+                                        "/auth/refresh-token",
+                                        "/health",
+                                        "/rest/api/1/producto/all",
+                                        "/rest/api/1/producto/top",
+                                        "/rest/api/1/producto/categorias",
+                                        "/rest/api/1/vendor/all")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

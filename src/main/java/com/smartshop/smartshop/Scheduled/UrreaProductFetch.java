@@ -31,13 +31,13 @@ public class UrreaProductFetch {
     private final ProductRepository productRepository;
     private final VendorRepository vendorRepository;
 
-    @EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
     public void runOnStartup() {
         log.info("Ejecutando tarea de Urrea en el inicio...");
         this.fetchUrreaProductsAsync();
     }
 
-    @Scheduled(cron = "0 0 */2 * * *")
+    //@Scheduled(cron = "0 0 */2 * * *")
     public void fetchUrreaProductsScheduled() {
         log.info("Ejecutando tarea programada de Urrea...");
         this.fetchUrreaProductsAsync();
@@ -159,6 +159,7 @@ public class UrreaProductFetch {
                     .Id(urreaProduct.getCodigo())
                     .vendor(vendorRepository.findByVendorName(urreaProduct.getMarca()).orElse(null))
                     .name(urreaProduct.getNombreLargo())
+                    .category(urreaProduct.getFamilia())
                     .imageUrl(urreaProduct.getFotografia())
                     .build();
             productRepository.save(producto);

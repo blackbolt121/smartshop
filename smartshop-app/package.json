@@ -14,7 +14,7 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.5",
     "@mui/joy": "^5.0.0-beta.51",
-    "@mui/material": "^6.4.7",
+    "@mui/material": "^6.4.10",
     "@tailwindcss/vite": "^4.0.8",
     "axios": "^1.7.9",
     "react": "^19.0.0",

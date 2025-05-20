@@ -35,4 +35,6 @@ public class Producto {
             this.Id = UUID.randomUUID().toString();
         }
     }
+    @Column
+    private String category;
 }

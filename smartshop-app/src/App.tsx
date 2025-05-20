@@ -15,16 +15,23 @@ import { useEffect } from 'react';
 import { Tienda } from './components/Tienda/Tienda';
 import { Footer } from './components/Footer';
 import { ProductPage } from './components/Product/ProductPage';
+import Cart from './components/Cart';
+import { useLocation } from 'react-router-dom';
+import Payment from './components/Payment';
 
 function App() {
 
   const navigate = useNavigate()
-
+  const location = useLocation()
 
   useEffect(() => {
-    console.log(getAccessToken())
+    
+    let path = location.pathname
+
+    console.log(path)
+
     if(getAccessToken() === null){
-      if(!(location.href.includes("login") || location.href.includes("signup"))){
+      if(location.pathname.startsWith("/cart")){
         navigate("/login")
       }
     }
@@ -48,6 +55,7 @@ function App() {
             <Route path='/contact' element={<div><ContactPage /></div>} />
             <Route path='/tienda' element={<Tienda />} />
             <Route path='/producto/:id' element={<ProductPage />} />
+            <Route path='/cart' element={<Cart />} />
             <Route path='*' element={<Typography>404 Not Found</Typography>} />
 
         </Routes>

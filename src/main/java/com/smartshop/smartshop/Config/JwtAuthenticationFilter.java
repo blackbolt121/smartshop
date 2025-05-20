@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -50,6 +51,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (request.getServletPath().contains("/auth/")) {
             logger.info("JWT Authentication Filter for authentication");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
+        if(List.of("/rest/api/1/producto/all", "/rest/api/1/producto/top", "/rest/api/1/producto/categorias", "/rest/api/1/vendor/all")
+                .stream()
+                .anyMatch(uri -> request.getServletPath().startsWith(uri))
+                &&
+                request.getMethod().equals("GET")) {
             filterChain.doFilter(request, response);
             return;
         }

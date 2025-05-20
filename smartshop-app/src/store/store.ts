@@ -1,5 +1,6 @@
 // src/store.ts
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import cartReducer from './cartSlice';
 
 
 export type Product = {
@@ -87,6 +88,7 @@ const store = configureStore({
   reducer: {
     counter: counterSlice.reducer,
     vendors: vendorSlice.reducer,
+    cart: cartReducer
   },
 });
 
