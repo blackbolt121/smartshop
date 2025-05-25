@@ -1,10 +1,10 @@
 import urrea from "../assets/urrea.jpg";
-import foy from "../assets/foy.png"
+// import foy from "../assets/foy.png"
 import surtex from "../assets/surtex.jpg"
-import prolock from "../assets/prolock.jpg"
+// import prolock from "../assets/prolock.jpg"
 import lock from "../assets/lock.jpg"
-import proforza from "../assets/proforza.jpg"
-import balta from "../assets/balta.jpg"
+// import proforza from "../assets/proforza.jpg"
+// import balta from "../assets/balta.jpg"
 
 
 

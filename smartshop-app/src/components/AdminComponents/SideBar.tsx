@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, List, ListItem, ListItemButton, ListItemContent } from '@mui/joy';
 import { Link } from 'react-router-dom';
 

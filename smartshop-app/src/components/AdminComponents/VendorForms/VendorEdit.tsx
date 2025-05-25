@@ -132,6 +132,7 @@ export const VendorEdit = () => {
         <div>
             <FormLabel>Vendor List</FormLabel>
             <Select name='vendor' onChange={(event, value) => {
+                event
                 const vendor = vendorList.find(v => v.vendorId === value);
                 setSelectedVendor(vendor || null);
             }}>

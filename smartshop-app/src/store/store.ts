@@ -74,6 +74,7 @@ const vendorSlice = createSlice({
       }
     },
     setVendors: (state, action: PayloadAction<Vendor[]>) => {
+      state
       state = action.payload;
     }
   },

@@ -256,6 +256,7 @@ export const Tienda = () => {
                                 name="brand"
                                 value={filters.brand}
                                 onChange={(e, value) => {
+                                    e
                                     if(vendors.length != 0 && value != null){
                                         handleCategoriaMarca("brand", value || "")
                                     }
@@ -284,7 +285,10 @@ export const Tienda = () => {
                     size="large"
                     count={numPages}
                     page={page}
-                    onChange={(e, page) => setPage(page)}
+                    onChange={(e, page) => {
+                        e
+                        setPage(page)
+                    } }
                     sx={{ display: "flex", justifyContent: "center" }}
                     color="primary"
                 />

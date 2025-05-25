@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Input, Typography, FormLabel, Select, Option } from "@mui/joy";
+import { Button, Input, Typography, FormLabel, Select, Option } from "@mui/joy";
 import axios from "axios";
 import { Vendor } from "../../../store/store";
 import { getAccessToken } from "../../../store/auth";
@@ -74,6 +74,7 @@ export const ProductCreate = () => {
 
             <FormLabel>Vendor</FormLabel>
             <Select name="vendor" value={product.vendor} onChange={(e, value) => {
+                e
                 if (value) setProduct({ ...product, "vendor": value });
             }}>
                 {vendors.map((vendor: Vendor) => (

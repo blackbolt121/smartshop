@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Button } from "@mui/joy";
-import { useRef } from "react";
+// import { useRef } from "react";
 
 
 
@@ -11,7 +11,7 @@ interface PaymentSlots {
 
 const Payment = ({token, count}: PaymentSlots) => {
 
-    const initialized = useRef(false);
+    // const initialized = useRef(false);
 
       useEffect(() => {
     // Define callbacks globalmente

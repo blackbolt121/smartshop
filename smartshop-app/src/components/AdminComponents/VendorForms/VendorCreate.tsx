@@ -1,6 +1,5 @@
 import { Button, FormControl, FormLabel, Input } from '@mui/joy';
 import axios from 'axios';
-import React from 'react';
 import { getAccessToken } from '../../../store/auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

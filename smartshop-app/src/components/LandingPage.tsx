@@ -1,4 +1,4 @@
-import { Button, Divider, Typography } from '@mui/joy';
+import { Button, Typography } from '@mui/joy';
 import { ProductCard } from './ProductCard';
 import { useEffect } from 'react';
 import axios from 'axios';

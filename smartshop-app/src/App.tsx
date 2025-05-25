@@ -17,7 +17,6 @@ import { Footer } from './components/Footer';
 import { ProductPage } from './components/Product/ProductPage';
 import Cart from './components/Cart';
 import { useLocation } from 'react-router-dom';
-import Payment from './components/Payment';
 
 function App() {
 

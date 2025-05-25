@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Input, Typography, FormLabel, Select, Option } from "@mui/joy";
+import { Button, Input, Typography, FormLabel, Select, Option } from "@mui/joy";
 import axios from "axios";
 import { getAccessToken } from "../../../store/auth";
 import { Vendor } from "../../../store/store";
@@ -115,7 +115,7 @@ export const ProductEdit = () => {
             <FormLabel>Select Product</FormLabel>
             <Select value={selectedProductId} onChange={(e: any, value: any) => {
 
-
+                e
                 console.log(value)
                 setSelectedProductId(value)
             }}>
@@ -137,6 +137,7 @@ export const ProductEdit = () => {
 
                     <FormLabel>Vendor</FormLabel>
                     <Select name="vendor" value={product.vendor} onChange={(e, value) => {
+                        e
                         if (value) setProduct({ ...product, "vendor": value });
                     }}>
                         {vendors && vendors.map((vendor: Vendor) => (
