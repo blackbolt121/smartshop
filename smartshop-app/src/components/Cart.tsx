@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+// import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { clearCart } from "../store/cartSlice";
-import { Button, Typography } from "@mui/joy";
+import {  Typography } from "@mui/joy";
+//import { Button } from "@mui/joy";
 import { CartItem } from "../store/cartSlice";
 import { getAccessToken } from "../store/auth";
 import { useNavigate } from "react-router-dom";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import CartItemCard from "./CartItemCard";
-import Payment from "./Payment";
-import { useRef } from "react";
+//import Payment from "./Payment";
+// import { useRef } from "react";
 interface AmountTokenizationRequest {
   "clientId": number,
   "storeId": number,
@@ -20,11 +22,11 @@ interface AmountTokenizationRequest {
 
 
 const Cart = () => {
-  const loaded = useRef(false)
+  // const loaded = useRef(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  const [token, setToken] = useState("")
+  // const [token, setToken] = useState("")
 
   const loadToken = () => {
     const price = cartItems.reduce((value: number, item: CartItem) => (item.price * item.quantity) + value, 0)
@@ -43,7 +45,7 @@ const Cart = () => {
       .then(res => res.json())
       .then((res: AmountTokenizationRequest) => {
         console.log(res)
-        setToken(res.tokenAmount)
+        // setToken(res.tokenAmount)
       })
   }
   useEffect(() => {
@@ -52,18 +54,19 @@ const Cart = () => {
       navigate("/login");
     }
     loadToken()
+    console.log(cartItems)
     
   }, []);
-  useEffect(()=>{
-    if(token.length > 0 && window.NetPay){
-      window.NetPay.init("pk_netpay_JGFtQNUFIENMlhkoBXdgiozmQ")
-      window.NetPay.setSandboxMode(true)
-      loaded.current = true
-    }
-  }, [token])
+  // useEffect(()=>{
+  //   if(token.length > 0 && window.NetPay){
+  //     window.NetPay.init("pk_netpay_JGFtQNUFIENMlhkoBXdgiozmQ")
+  //     window.NetPay.setSandboxMode(true)
+  //     loaded.current = true
+  //   }
+  // }, [token])
   useEffect(() => {
     // Definir funciones globales para NetPay
-    setToken("")
+    // setToken("")
     loadToken()
     
   }, [cartItems]);
@@ -108,7 +111,7 @@ const Cart = () => {
                 Vaciar carrito
               </button>
 
-              {token.length > 0 ? <Payment token={token} count={cartItems.length} /> : <Button loading />}
+              {/* {token.length > 0 ? <Payment token={token} count={cartItems.length} /> : <Button loading />} */}
             </div>
 
           </div>

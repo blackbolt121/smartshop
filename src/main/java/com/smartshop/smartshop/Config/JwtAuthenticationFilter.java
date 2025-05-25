@@ -49,6 +49,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        if(!request.getServletPath().startsWith("/rest/api/1")){
+            logger.info(request.getRequestURI());
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (request.getServletPath().contains("/auth/")) {
             logger.info("JWT Authentication Filter for authentication");
             filterChain.doFilter(request, response);
@@ -56,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
-        if(List.of("/rest/api/1/producto/all", "/rest/api/1/producto/top", "/rest/api/1/producto/categorias", "/rest/api/1/vendor/all")
+        if(List.of("/rest/api/1/producto/all", "/rest/api/1/producto/top", "/rest/api/1/producto/categorias", "/rest/api/1/vendor/all", "/rest/api/1/producto/")
                 .stream()
                 .anyMatch(uri -> request.getServletPath().startsWith(uri))
                 &&

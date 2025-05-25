@@ -63,9 +63,12 @@ public class SecurityConfig {
                                         "/rest/api/1/producto/all",
                                         "/rest/api/1/producto/top",
                                         "/rest/api/1/producto/categorias",
+                                        "/rest/api/1/producto/**",
                                         "/rest/api/1/vendor/all")
                                 .permitAll()
-                                .anyRequest()
+                                .requestMatchers("/", "/index.html", "/assets/**", "/about", "/contact", "/tienda", "/cart", "/producto/**", "/checkout")
+                                .permitAll()
+                                .requestMatchers("/rest/api/1/**")
                                 .authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
