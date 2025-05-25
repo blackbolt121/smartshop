@@ -1,52 +1,51 @@
 package com.smartshop.smartshop.Services;
 
-import com.smartshop.smartshop.Models.Cart;
-import com.smartshop.smartshop.Models.Producto;
+import com.smartshop.smartshop.Models.*;
+import com.smartshop.smartshop.Repositories.CartItemRepository;
+import com.smartshop.smartshop.Repositories.CartRepository;
 import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.RequestModels.CartItemRequest;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.smartshop.smartshop.Models.CartItem;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class CartService {
 
-    private final Map<String, Cart> temporaryCarts = new HashMap<>();
-
+    private final CartItemRepository cartItemRepository;
+    private final CartRepository cartRepository;
     private final ProductRepository productoRepository;
 
-    public CartService(ProductRepository productoRepository) {
-        this.productoRepository = productoRepository;
-    }
 
-    public Cart addToCart(String userId, CartItemRequest itemRequest) {
-        Cart cart = temporaryCarts.getOrDefault(userId, new Cart());
-        Producto producto = productoRepository.findById(itemRequest.productId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    public Cart createCart(CartItemRequest[] cartItemRequest, Usuario usuario) {
+        Cart cart = new Cart();
+        cartRepository.save(cart);
+        Set<CartItem> cartItems = new HashSet<>();
 
-        Optional<CartItem> existingItem = cart.getCartItems().stream()
-                .filter(ci -> ci.getProducto().getId().equals(producto.getId()))
-                .findFirst();
+        for(CartItemRequest cartItemRequest1 : cartItemRequest) {
+            try{
+                CartItemId cartItemId = new CartItemId();
+                cartItemId.setCartId(cart.getId());
+                cartItemId.setProductId(cartItemRequest1.productId());
+                Producto product = productoRepository.findById(cartItemRequest1.productId()).orElse(null);
+                Integer quantity = cartItemRequest1.quantity();
+                CartItem cartItem = new CartItem(cartItemId, cart, product, quantity);
+                cartItemRepository.save(cartItem);
+                cartItems.add(cartItem);
+            }catch (Exception ignored){
 
-        if (existingItem.isPresent()) {
-            existingItem.get().setCantidad(existingItem.get().getCantidad() + itemRequest.quantity());
-        } else {
-            CartItem item = new CartItem();
-            item.setProducto(producto);
-            item.setCantidad(itemRequest.quantity());
-            item.setCart(cart);
-            cart.getCartItems().add(item);
+            }
         }
+        cartItemRepository.saveAll(cartItems);
+        cart.setItems(cartItems);
+        cart.setUsuario(usuario);
+        cartRepository.save(cart);
 
-        cart.setUsuarioId(userId); // útil para luego guardar si paga
-        temporaryCarts.put(userId, cart);
+
         return cart;
-    }
-
-    public Cart getCart(String userId) {
-        return temporaryCarts.getOrDefault(userId, new Cart());
     }
 }

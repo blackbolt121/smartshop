@@ -13,6 +13,10 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    Usuario usuario;
+
+    private String ordenPago;
 
     // Relación con CartItem (uno a muchos)
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
