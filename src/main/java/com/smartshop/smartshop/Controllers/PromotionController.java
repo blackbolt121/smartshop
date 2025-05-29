@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/promotions")
+@RequestMapping("/rest/api/1/promotions")
 public class PromotionController {
 
     private final PromotionService promotionService;
