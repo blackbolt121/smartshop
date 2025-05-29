@@ -65,3 +65,4 @@ dist
 /build
 /static/assets/
 /build/classes
+/src/main/resources/static/*
