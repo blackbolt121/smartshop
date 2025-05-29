@@ -22,7 +22,7 @@ public interface ProductRepository extends JpaRepository<Producto, String> {
 
     @Query(value = """
         SELECT * FROM producto as p
-        WHERE MATCH(p.name, p.description, p.category)
+        WHERE MATCH(p.id, p.name, p.description, p.category)
         AGAINST(:query IN NATURAL LANGUAGE MODE)
         """, nativeQuery = true)
     Page<Producto> buscarFullText(@Param("query") String query, Pageable pageable);
