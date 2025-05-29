@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <title>Pago con NetPay</title>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <script src="https://docs.netpay.mx/cdn/js/latest/checkout.plus.js"></script>
         <script>
             window.onload = function () {
@@ -19,29 +20,88 @@
         <style>
             body {
                 font-family: sans-serif;
-                padding: 1rem;
             }
         </style>
     </head>
     <body>
-    <button
-            id="netpay-checkout"
-            data-button-title="Continuar"
-            data-street1="Filosofos 100"
-            data-country="MX"
-            data-city="Monterrey"
-            data-postal-code="64700"
-            data-state="NL"
-            th:attr="data-token=${token}"
-            data-phone-number="8125877000"
-            data-email="accept@netpay.com.mx"
-            data-merchant-reference-code="folio-unico-214"
-            data-onsuccess="onPaymentSuccess"
-            data-onerror="onPaymentError"
-            data-product-count="5"
-            data-commerce-name="Nombre del comercio"
-    >
-        Pagar
-    </button>
+    <!-- header.html -->
+    <header class="bg-white shadow-md mb-8">
+        <div class="max-w-screen-xl mx-auto px-4 py-5 flex items-center justify-between">
+
+            <!-- Logo -->
+            <div class="flex items-center space-x-3">
+                <a th:href="@{/}">
+                    <img src="/images/logo.png" alt="SmartShop" class="w-40" />
+                </a>
+            </div>
+
+            <!-- Menu desktop -->
+            <div class="hidden md:flex space-x-8 text-black md:items-center md:justify-center">
+                <a th:href="@{/}" class="hover:text-red-500 transition-colors font-bold">Home</a>
+                <a th:href="@{/about}" class="hover:text-red-500 transition-colors font-bold">About</a>
+                <a th:href="@{/contact}" class="hover:text-red-500 transition-colors font-bold">Contact</a>
+                <a th:href="@{/tienda}" class="hover:text-red-500 transition-colors font-bold">Tienda</a>
+
+            </div>
+
+            <!-- Botón mobile -->
+            <div class="md:hidden">
+                <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')"
+                        class="text-black focus:outline-none">
+                    <span class="material-icons">menu</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white p-4 space-y-4">
+            <a th:href="@{/}" class="block text-black hover:text-red-500 font-bold">Home</a>
+            <a th:href="@{/about}" class="block text-black hover:text-red-500 font-bold">About</a>
+            <a th:href="@{/contact}" class="block text-black hover:text-red-500 font-bold">Contact</a>
+            <a th:href="@{/tienda}" class="block text-black hover:text-red-500 font-bold">Tienda</a>
+        </div>
+    </header>
+    <div class="flex flex-col justify-center items-center gap-8 w-[60%] mx-auto">
+        <table class="w-full text-center">
+            <thead class="bg-red-500 text-white">
+            <tr>
+                <th class="p-2">ID</th>
+                <th class="p-2">Nombre</th>
+                <th class="p-2">Cantidad</th>
+                <th class="p-2">Precio Unitario</th>
+                <th class="p-2">Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${cart.getItems()}">
+                <td th:text="${item.getProduct().getId()}" class="p-2"></td>
+                <td th:text="${item.getProduct().getName()}" class="p-2"></td>
+                <td th:text="${item.getQuantity()}" class="p-2"></td>
+                <td class="p-2">$ <span th:text="${#numbers.formatDecimal(item.getProduct().getPrice(), 1, 'COMMA', 2, 'POINT')}"></span></td>
+                <td class="p-2">$ <span th:text="${#numbers.formatDecimal(item.getProduct().getPrice()*item.getQuantity(), 1, 'COMMA', 2, 'POINT')}"></span></td>
+            </tr>
+            </tbody>
+        </table>
+        <span class="text-xl font-bold">Total a pagar: $<span th:text="${#numbers.formatDecimal(price, 1, 'COMMA', 2, 'POINT')}"></span> MXN</span>
+        <button class="p-1 w-1/4"
+                id="netpay-checkout"
+                data-button-title="Continuar"
+                data-street1="Filosofos 100"
+                data-country="MX"
+                data-city="Monterrey"
+                data-postal-code="64700"
+                data-state="NL"
+                th:attr="data-token=${token}"
+                data-phone-number="8125877000"
+                data-email="accept@netpay.com.mx"
+                data-merchant-reference-code="folio-unico-214"
+                data-onsuccess="onPaymentSuccess"
+                data-onerror="onPaymentError"
+                data-product-count="5"
+                data-commerce-name="Nombre del comercio"
+        >
+            Pagar
+        </button>
+    </div>
     </body>
 </html>

@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/store";
 import { clearCart } from "../store/cartSlice";
-import {  Typography } from "@mui/joy";
+import { Button, Typography } from "@mui/joy";
 //import { Button } from "@mui/joy";
 import { CartItem } from "../store/cartSlice";
 import { getAccessToken } from "../store/auth";
@@ -55,7 +55,7 @@ const Cart = () => {
     }
     loadToken()
     console.log(cartItems)
-    
+
   }, []);
   // useEffect(()=>{
   //   if(token.length > 0 && window.NetPay){
@@ -68,11 +68,46 @@ const Cart = () => {
     // Definir funciones globales para NetPay
     // setToken("")
     loadToken()
-    
+
   }, [cartItems]);
 
   const handleClearCart = () => {
     dispatch(clearCart());
+  };
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch('http://localhost:8080/rest/api/1/cart/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${getAccessToken()}`
+        },
+        credentials: 'include', // Si usas cookies
+        body: JSON.stringify(cartItems.map(item => ({
+          productId: item.id,
+          quantity: item.quantity
+        })))
+      });
+
+      console.log(response.status)
+      
+
+      if (!response.ok) throw new Error('Error al procesar el carrito');
+
+      const cart = await response.json();
+      console.log(cart)
+
+      console.log(`/checkout?cart=${cart.id}`)
+
+      // Abre la ruta en una nueva pestaña con el ID como parámetro
+      window.open(`/checkout?cart=${cart.cartId}`, '_blank');
+    } catch (error) {
+      console.error('Error al enviar el carrito:', error);
+      alert('No se pudo procesar el carrito');
+    }
   };
 
   return (
@@ -112,6 +147,9 @@ const Cart = () => {
               </button>
 
               {/* {token.length > 0 ? <Payment token={token} count={cartItems.length} /> : <Button loading />} */}
+              <form onSubmit={handleSubmit}>
+                <Button type="submit">Pagar</Button>
+              </form>
             </div>
 
           </div>

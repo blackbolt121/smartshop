@@ -2,7 +2,7 @@ import { Typography, Card } from "@mui/joy"
 import { useNavigate } from "react-router-dom"
 
 interface ProductCardProps {
-  id: number
+  id: string
   name?: string
   price?: number
   description?: string
@@ -17,7 +17,7 @@ export const ProductCard = (ProductCardProps: ProductCardProps) => {
   return <Card
     variant="outlined"
     className="w-72 h-[28rem] bg-white shadow-lg hover:cursor-pointer flex flex-col justify-between p-4"
-    onClick={() => navigate(`/producto/${ProductCardProps.id}`)}
+    onClick={() => navigate(`/producto/${encodeURIComponent(ProductCardProps.id)}`)}
     key={ProductCardProps.id}
     >
       <img
@@ -32,7 +32,7 @@ export const ProductCard = (ProductCardProps: ProductCardProps) => {
         </Typography>
 
         <Typography level="body-md" className="text-gray-600 mb-4 line-clamp-3">
-          {ProductCardProps.description || "Product Description"}
+          {ProductCardProps.description?.substring(0,15)+"..." || "Product Description"}
         </Typography>
         <Typography level="body-md" className="text-gray-600 mb-4 line-clamp-3">
           <strong>SKU: </strong>{ProductCardProps.id || "Product SKU"}

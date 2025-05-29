@@ -22,8 +22,9 @@ export const ProductPage = () => {
   useEffect(() => {
     async function fetchProductDetails() {
       try {
+        console.log(`http://localhost:8080/rest/api/1/producto?id=${encodeURIComponent(id || "")}`)
         const response = await axios.get<Product>(
-          `http://localhost:8080/rest/api/1/producto/${id}`,
+          `http://localhost:8080/rest/api/1/producto?id=${encodeURIComponent(id || "")}`,
           {
             headers: {
               'Content-Type': 'application/json',

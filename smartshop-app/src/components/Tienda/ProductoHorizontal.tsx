@@ -8,7 +8,7 @@ export const ProductoHorizontal = (producto: Product) => {
 
     return (
         <div className="flex flex-row bg-white p-4 rounded-lg shadow-md gap-1 hover:cursor-pointer" onClick={()=>{
-            navigate(`/producto/${producto.id}`)
+            navigate(`/producto/${encodeURIComponent(producto.id)}`)
         }}>
             <div className="flex justify-center items-center">
                 <img src={producto.imageUrl} alt={producto.name} className="w-24 h-24" />

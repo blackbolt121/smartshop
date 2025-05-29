@@ -83,7 +83,7 @@ public class UrreaProductFetch {
                         precio = 0.0; // O usa null si la columna permite valores nulos
                     }
                     UrreaProductRequest productRequest = new UrreaProductRequest(
-                            productJson.optString("codigo"),
+                            productJson.optString("codigo").replace("/", "-"),
                             productJson.optString("nombreLargo"),
                             productJson.optString("DescripcionProducto"),
                             productJson.optString("Marca"),

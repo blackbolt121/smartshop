@@ -66,7 +66,7 @@ public class SecurityConfig {
                                         "/rest/api/1/producto/**",
                                         "/rest/api/1/vendor/all")
                                 .permitAll()
-                                .requestMatchers("/", "/index.html", "/assets/**", "/about", "/contact", "/tienda", "/cart", "/producto/**", "/checkout")
+                                .requestMatchers("/", "/index.html", "/assets/**", "/images/**", "/about", "/contact", "/tienda", "/cart", "/producto/**", "/checkout")
                                 .permitAll()
                                 .requestMatchers("/rest/api/1/**")
                                 .authenticated()

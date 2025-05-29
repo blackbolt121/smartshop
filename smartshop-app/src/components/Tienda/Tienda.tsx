@@ -185,7 +185,7 @@ export const Tienda = () => {
                         <MdSell className="text-amber-300"></MdSell>Todos los productos ({total})
                     </h1>
                     <div className="flex space-x-4">
-                        <Select defaultValue={"price-desc"}>
+                        {/* <Select defaultValue={"price-desc"}>
                             <Option label="Precio (Ascendente)" value="price-asc">
                                 Precio (Ascendente)
                             </Option>
@@ -195,7 +195,7 @@ export const Tienda = () => {
                             <Option label="Popularidad" value="popularity">
                                 Popularidad
                             </Option>
-                        </Select>
+                        </Select> */}
                         <Input type="text" placeholder="Buscar producto" />
                     </div>
                 </div>

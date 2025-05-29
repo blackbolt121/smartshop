@@ -82,19 +82,20 @@ public class ProductController {
     public ResponseEntity<List<Producto>> getTopProducts(){
         return ResponseEntity.ok(productRepository.findRandomProducts());
     }
-    @GetMapping(path = "{producto}")
-    public ResponseEntity<Producto> getProduct(@PathVariable String producto){
-        Producto product = service.getProduct(producto).orElse(null);
+    @GetMapping(path = "")
+    public ResponseEntity<Producto> getProduct(@RequestParam String id){
+        System.out.println(id);
+        Producto product = service.getProduct(id).orElse(null);
         if(product != null){
             return ResponseEntity.ok().body(product);
         }
         return ResponseEntity.notFound().build();
     }
-    @PutMapping(path = "{producto}")
-    public ResponseEntity<String> updateProduct(@PathVariable String producto, @RequestBody Producto updatedProduct){
+    @PutMapping(path = "")
+    public ResponseEntity<String> updateProduct(@RequestParam String id, @RequestBody Producto updatedProduct){
 
 
-        Producto search = service.getProduct(producto).orElse(null);
+        Producto search = service.getProduct(id).orElse(null);
 
         if(search == null){
             return ResponseEntity.notFound().build();
