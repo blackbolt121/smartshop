@@ -21,6 +21,7 @@ build/
 public/build/
 package-lock.json
 yarn-error.log
+.gradle/
 
 # Archivos de Terraform
 .terraform/
