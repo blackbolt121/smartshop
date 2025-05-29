@@ -61,5 +61,6 @@ Thumbs.db
 node_modules/*
 *node_modules
 dist
-/build/*
-/static/assets/*
+/build
+/static/assets/
+/build/classes
