@@ -100,6 +100,32 @@ public class AuthService {
         saveUserToken(user, accessToken);
         return new TokenResponse(accessToken, refreshToken);
     }
+
+
+    public boolean authenticateAdmin(final AuthRequest request) {
+        Logger.getGlobal().info("Authenticating...");
+        try{
+            var auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
+            Logger.getGlobal().info("User login: " + auth.isAuthenticated());
+        }catch (Exception exception){
+
+            Logger.getGlobal().severe(exception.getMessage());
+            throw exception;
+        }
+
+
+
+        final Usuario user = userRepository.findByEmail(request.email())
+                .orElseThrow();
+        return true;
+    }
+
+
     public TokenResponse refreshToken(@NotNull final String authentication) {
 
         if (authentication == null || !authentication.startsWith("Bearer ")) {
@@ -123,4 +149,18 @@ public class AuthService {
 
         return new TokenResponse(accessToken, refreshToken);
     }
+
+    public Boolean validateToken(@NotNull final String token) {
+        final String username = jwtService.extractUsername(token);
+        if (username == null) {
+            return false;
+        }
+        try{
+            final Usuario user = userRepository.findByEmail(username).orElseThrow();
+            return jwtService.isTokenValid(token, user);
+        }catch (Exception exception){
+            return false;
+        }
+    }
+
 }

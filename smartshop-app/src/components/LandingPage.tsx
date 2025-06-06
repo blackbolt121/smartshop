@@ -7,6 +7,7 @@ import { Product } from '../store/store';
 import { useState } from 'react';
 import ImageCarousel from './ImageCarousel';
 import { useNavigate } from 'react-router-dom';
+import PromotionsCarousel from './PromotionCarousel/PromotionCarousel';
 
 const LandingPage = () => {
 
@@ -86,7 +87,10 @@ const LandingPage = () => {
                     navigate("/tienda")
                 }}>Compara ahora</Button>
             </header>
-            
+            <br/>
+            <div>
+                <PromotionsCarousel />
+            </div>
             <br />
             <div className='bg-white shadow-lg flex flex-col py-10 px-4'>
                 <Typography level="h2" className="" sx={{mb: 2}}>Top Productos</Typography>

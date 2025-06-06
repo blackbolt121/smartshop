@@ -56,20 +56,40 @@ public class SecurityConfig {
                         req
                                 .requestMatchers(HttpMethod.OPTIONS)
                                 .permitAll()
-                                .requestMatchers("/auth/register",
-                                        "/auth/login",
-                                        "/auth/refresh-token",
+                                .requestMatchers(
                                         "/health",
                                         "/rest/api/1/producto/all",
                                         "/rest/api/1/producto/top",
                                         "/rest/api/1/producto/categorias",
                                         "/rest/api/1/producto/**",
+                                        "/rest/api/1/producto",
                                         "/rest/api/1/vendor/all")
                                 .permitAll()
-                                .requestMatchers("/", "/index.html", "/assets/**", "/images/**", "/about", "/contact", "/tienda", "/cart", "/producto/**", "/checkout")
+                                .requestMatchers("/", "/index.html", "/assets/**",
+                                        "/images/**", "/about", "/contact",
+                                        "/tienda", "/cart", "/producto/**",
+                                        "/checkout")
+                                .permitAll()
+                                .requestMatchers("/admin/login",
+                                        "/admin")
+                                .permitAll()
+                                .requestMatchers("/auth/**")
+                                .permitAll()
+                                .requestMatchers("/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/index.html",
+                                        "/webjars/**")
+                                .permitAll()
+                                .requestMatchers("/rest/api/1/promotions/**",
+                                        "/rest/api/1/promotions")
                                 .permitAll()
                                 .requestMatchers("/rest/api/1/**")
                                 .authenticated()
+                                .requestMatchers("/admin/**")
+                                .authenticated()
+                                .anyRequest().permitAll()
+
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)

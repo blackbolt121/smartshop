@@ -20,6 +20,10 @@ public class PromotionService {
         return promotionRepository.findByActiveTrueOrderByDisplayOrderAsc();
     }
 
+    public List<Promotion> findAll() {
+        return promotionRepository.findAll();
+    }
+
     public Optional<Promotion> getById(String id) {
         return promotionRepository.findById(id);
     }

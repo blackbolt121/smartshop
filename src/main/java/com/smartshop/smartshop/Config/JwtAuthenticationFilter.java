@@ -37,23 +37,53 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
     private final ConversionService conversionService;
 
+    private String extractJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                if ("access_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        String path = request.getRequestURI();
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);  // Skip processing for OPTIONS
             return;
         }
 
-        if(!request.getServletPath().startsWith("/rest/api/1")){
-            logger.info(request.getRequestURI());
+        if (path.startsWith("/swagger-ui") || path.startsWith("/v3/api-docs") || path.equals("/swagger-ui.html") || path.equals("/v2/api-docs")) {
+            logger.info("Swagger paths");
             filterChain.doFilter(request, response);
             return;
         }
+        if(request.getRequestURI().startsWith("/admin/login")){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if(path.startsWith("/rest/api/1/promotions") && request.getMethod().equals("GET")){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if(!request.getServletPath().startsWith("/rest/api/1") && !request.getServletPath().startsWith("/admin")) {
+            logger.info(request.getRequestURI());
+            filterChain.doFilter(request, response);
+            logger.info("Skipping jwt authentication");
+            return;
+        }
+
+
 
         if (request.getServletPath().contains("/auth/")) {
             logger.info("JWT Authentication Filter for authentication");
@@ -61,8 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-
-        if(List.of("/rest/api/1/producto/all", "/rest/api/1/producto/top", "/rest/api/1/producto/categorias", "/rest/api/1/vendor/all", "/rest/api/1/producto/")
+        if(List.of("/rest/api/1/producto/all", "/rest/api/1/producto/top", "/rest/api/1/producto/categorias", "/rest/api/1/vendor/all", "/rest/api/1/producto/", "/rest/api/1/producto")
                 .stream()
                 .anyMatch(uri -> request.getServletPath().startsWith(uri))
                 &&
@@ -70,15 +99,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        String jwt = null;
 
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        log.info("Header " + authHeader);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.split(" ")[1];
+        }
+
+        if(jwt == null){
+            jwt = extractJwtFromCookies(request);
+        }
+
+        if(jwt == null) {
             logger.info("Invalid JWT token");
+
+            if(path.startsWith("/admin")){
+                response.sendRedirect(request.getContextPath() + "/admin/login");
+                return;
+            }
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.split(" ")[1];
         final String userEmail = jwtService.extractUsername(jwt);
         logger.info("JWT token: " + jwt);
         logger.info("User: " + userEmail);
@@ -94,6 +137,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .orElse(false);
 
         logger.info("isTokenExpiredOrRevoked: " + isTokenExpiredOrRevoked);
+
+        if(!isTokenExpiredOrRevoked && path.startsWith("/admin")) {
+            response.sendRedirect(request.getContextPath() + "/admin/login");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (isTokenExpiredOrRevoked) {
             final Optional<Usuario> user = userRepository.findByEmail(userEmail);
@@ -111,6 +160,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                logger.info("Successfully authenticated user");
             }
         }
         filterChain.doFilter(request, response);

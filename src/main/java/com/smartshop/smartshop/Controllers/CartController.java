@@ -4,6 +4,7 @@ import com.smartshop.smartshop.DTO.CartResponseDto;
 import com.smartshop.smartshop.Models.Usuario;
 import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.CartService;
+import com.smartshop.smartshop.Services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,14 +12,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.smartshop.smartshop.Models.Cart;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import com.smartshop.smartshop.RequestModels.CartItemRequest;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -30,6 +28,7 @@ public class CartController {
 
     private final CartService cartService;
     private final UserRepository userRepository;
+    private final UserService userService;
 
 
     @PostMapping("/order")
@@ -37,15 +36,32 @@ public class CartController {
             @RequestBody CartItemRequest[] itemRequest
             ) {
 
-        SecurityContext context = SecurityContextHolder.getContext();
-        User user = (User) context.getAuthentication().getPrincipal();
-        Optional<Usuario> opt_usuario = userRepository.findByEmail(user.getUsername());
-        if(opt_usuario.isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        Usuario usuario = opt_usuario.get();
+        Usuario usuario = userService.getUserByContext();
         Cart updatedCart = cartService.createCart(itemRequest, usuario);
         return ResponseEntity.ok().body(cartService.toDto(updatedCart));
+    }
+
+    @PostMapping("/order/{id}")
+    public ResponseEntity<String> addPayment(@PathVariable String id, @RequestBody Map<String, Object> body){
+
+
+        String transactionId = (String) body.get("transactionId");
+
+        Cart cart = cartService.getCartById(id);
+
+        if (cart == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!cart.getUsuario().getId().equals(userService.getUserByContext().getId())) {
+            return ResponseEntity.status(403).build();
+        }
+
+        cart.setOrdenPago(transactionId);
+
+        cartService.save(cart);
+
+        return ResponseEntity.ok().body("");
     }
 
 }

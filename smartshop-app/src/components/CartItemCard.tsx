@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Typography, Skeleton, Input, IconButton} from "@mui/joy";
+import { Typography, Skeleton, Input, IconButton } from "@mui/joy";
 import { useDispatch } from "react-redux";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { getAccessToken } from "../store/auth";
 import { FaTrashCan } from "react-icons/fa6";
 
 interface CartItemCardProps {
-  id: string; // corresponde a codigo
+  id: string;
   quantity: number;
 }
 
@@ -25,13 +25,12 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
 
   useEffect(() => {
     fetch(`http://localhost:8080/rest/api/1/urrea/producto/${id}`, {
-        headers: {
-            "Authorization": `Bearer ${getAccessToken()}`
-        }
+      headers: {
+        Authorization: `Bearer ${getAccessToken()}`,
+      },
     })
       .then((res) => res.json())
       .then((data: ProductoResponse) => {
-        console.log(data)
         setProducto(data);
         setLoading(false);
       })
@@ -46,7 +45,9 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
   };
 
   const handleQuantityChange = (qty: number) => {
-    dispatch(updateQuantity({ id, quantity: qty }));
+    if (!isNaN(qty) && qty >= 0) {
+      dispatch(updateQuantity({ id, quantity: qty }));
+    }
   };
 
   if (loading) {
@@ -70,37 +71,50 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
   }
 
   return (
-    <div className="flex gap-8 items-center border-b border-gray-200 p-4">
-      <img
-        src={producto.fotografia}
-        alt={producto.nombreLargo}
-        className="w-20 h-20 object-contain rounded"
-      />
-      <div className="flex-1">
-        <Typography level="h4">{producto.nombreLargo}</Typography>
-        <Typography level="body-lg" sx={{fontWeight: "bold", color: "black"}}>
+    <div className="flex flex-col md:flex-row justify-between items-center border border-gray-200 rounded-xl p-4 shadow-sm gap-4 bg-white hover:shadow-md transition">
+      {/* Imagen */}
+      <div className="w-24 h-24 flex-shrink-0 rounded overflow-hidden border p-1 border-gray-200">
+        <img
+          src={producto.fotografia}
+          alt={`Imagen de ${producto.nombreLargo}`}
+          className="w-full h-full object-contain"
+        />
+      </div>
+
+      {/* Detalles */}
+      <div className="flex-1 w-full md:px-4">
+        <Typography level="h4" className="text-gray-800 font-semibold">
+          {producto.nombreLargo}
+        </Typography>
+        <Typography level="body-md" className="text-green-700 font-bold mt-1">
           {producto.precio.toLocaleString("es-MX", {
             style: "currency",
             currency: "MXN",
           })}
         </Typography>
+        <Typography level="body-sm" className="text-gray-500">
+          Código: {producto.codigo}
+        </Typography>
       </div>
-      <div className="flex items-center gap-2">
-        <Input 
-            type="number"
-            sx={{
-                min: 0
-            }}
-            value={quantity}
-            onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
+
+      {/* Controles */}
+      <div className="flex items-center gap-3 mt-2 md:mt-0">
+        <Input
+          type="number"
+          size="sm"
+          variant="soft"
+          value={quantity}
+          sx={{ width: 80, color: "black", display: "flex", justifyContent: "center" }}
+          onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
         />
         <IconButton
           color="danger"
-          variant="outlined"
+          variant="soft"
           onClick={handleRemove}
           size="sm"
+          title="Eliminar del carrito"
         >
-            <FaTrashCan />
+          <FaTrashCan />
         </IconButton>
       </div>
     </div>

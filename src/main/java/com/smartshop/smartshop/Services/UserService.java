@@ -3,6 +3,9 @@ package com.smartshop.smartshop.Services;
 import com.smartshop.smartshop.Models.Usuario;
 import com.smartshop.smartshop.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,4 +32,19 @@ public class UserService {
         userRepository.save(usuario);
     }
 
+
+    public Usuario getUserByContext(){
+        SecurityContext context = SecurityContextHolder.getContext();
+        User user = (User) context.getAuthentication().getPrincipal();
+        Optional<Usuario> opt_usuario = userRepository.findByEmail(user.getUsername());
+        return opt_usuario.get();
+    }
+
+    public Usuario getUserByEmail(String email){
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public Usuario save(Usuario usuario){
+        return userRepository.save(usuario);
+    }
 }

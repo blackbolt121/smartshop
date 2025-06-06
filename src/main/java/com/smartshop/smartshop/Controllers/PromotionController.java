@@ -54,10 +54,10 @@ public class PromotionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createPromotion(
             @RequestParam String title,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-            @RequestParam Integer displayOrder,
-            @RequestParam boolean active,
+            @RequestParam(defaultValue = "2025-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(defaultValue = "2025-12-31T23:59:59") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(defaultValue = "0") Integer displayOrder,
+            @RequestParam(defaultValue = "true") boolean active,
             @RequestParam("image") MultipartFile imageFile
     ) {
         try {

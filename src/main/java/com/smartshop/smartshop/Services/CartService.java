@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -53,6 +54,10 @@ public class CartService {
         return cart;
     }
 
+    public Cart getCartById(String id) {
+        return cartRepository.findById(id).get();
+    }
+
     public CartResponseDto toDto(Cart cart) {
         List<CartItemDto> itemDtos = cart.getItems().stream()
                 .map(item -> new CartItemDto(
@@ -63,5 +68,13 @@ public class CartService {
                 .toList();
 
         return new CartResponseDto(cart.getId(), itemDtos);
+    }
+
+    public List<Cart> getAllCarts() {
+        return cartRepository.findAll().stream().filter(cart -> cart.getOrdenPago() != null).toList();
+    }
+
+    public void save(Cart cart) {
+        cartRepository.save(cart);
     }
 }

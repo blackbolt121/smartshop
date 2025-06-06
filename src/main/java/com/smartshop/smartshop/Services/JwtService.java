@@ -1,6 +1,7 @@
 package com.smartshop.smartshop.Services;
 
 import com.smartshop.smartshop.Models.Usuario;
+import com.smartshop.smartshop.Repositories.TokenRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -13,9 +14,15 @@ import java.util.Map;
 @Service
 public class JwtService {
 
+    private final TokenRepository tokenRepository;
     public String secretKey = "adsfalk11984akla719qaklada81932asjklnbjcjh2i1";
     public long expiration = 86400000;
     public long refresh = 604800000;
+
+    public JwtService(TokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
+
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
@@ -61,6 +68,17 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
                 .compact();
+    }
+
+    public boolean revokeToken(final String token, final Usuario usuario) {
+        tokenRepository.findByToken(token).ifPresent(token1 -> {
+            boolean status = token1.getUsuario().getId().equals(usuario.getId());
+            if (status) {
+                token1.setRevoked(true);
+                tokenRepository.save(token1);
+            }
+        });
+        return true;
     }
 
     private SecretKey getSignInKey(){

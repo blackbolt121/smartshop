@@ -20,7 +20,7 @@ public class Promotion {
     private String title;
 
     @Lob
-    @Column(name = "image", columnDefinition = "BLOB")
+    @Column(name = "image", columnDefinition = "MEDIUMBLOB")
     private byte[] image;
 
     private LocalDateTime startDate;
