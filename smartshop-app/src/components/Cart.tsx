@@ -92,8 +92,26 @@ const Cart = () => {
           <div>
 
             <div className="mt-6 text-right">
+              <span className="text-xl font-semibold text-gray-800">Subtotal:
+                  <span className="text-gray-800"> {(totalPrice).toLocaleString("es-MX", {
+                  style: "currency",
+                  currency: "MXN",
+                })} MXN</span>
+              </span>
+           </div>
+
+            <div className="mt-6 text-right">
+              <span className="text-xl font-semibold text-gray-800">IVA:
+                  <span className="text-gray-800"> {(totalPrice*0.16).toLocaleString("es-MX", {
+                  style: "currency",
+                  currency: "MXN",
+                })} MXN</span>
+              </span>
+           </div>
+
+            <div className="mt-6 text-right">
               <span className="text-xl font-semibold text-gray-800">Total a pagar:
-                  <span className="text-green-600"> {totalPrice.toLocaleString("es-MX", {
+                  <span className="text-green-600"> {(totalPrice*1.16).toLocaleString("es-MX", {
                   style: "currency",
                   currency: "MXN",
                 })} MXN</span>

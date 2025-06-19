@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -112,13 +113,18 @@ public class AdminController {
         }
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")
     public String dashboard(@CookieValue(value = "adminId") String id, Model model, HttpServletResponse response, HttpServletRequest request) {
         Usuario u = userService.getUserByEmail(id);
         try{
             SecurityContext context = SecurityContextHolder.getContext();
-            context.getAuthentication().getCredentials();
+            Usuario usuario = userService.getUserByContext();
+            boolean isAdmin = usuario.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN"));
+            log.info(isAdmin ? "Admin" : "User");
+            if(!isAdmin){
+                throw new Exception("You do not have permission to access this page");
+            }
         }catch(Exception e){
             Cookie[] cookies = request.getCookies();
             if (cookies != null) {
@@ -134,6 +140,9 @@ public class AdminController {
             log.info("Redirecting to Login");
             return "login";
         }
+
+
+
         model.addAttribute("usuario", u);
         return "panel";
     }

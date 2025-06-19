@@ -86,8 +86,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/rest/api/1/**")
                                 .authenticated()
-                                .requestMatchers("/admin/**")
-                                .authenticated()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().permitAll()
 
                 )

@@ -5,6 +5,7 @@ import com.smartshop.smartshop.Models.Usuario;
 import com.smartshop.smartshop.Repositories.TokenRepository;
 import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.JwtService;
+import com.smartshop.smartshop.Services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -39,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final ConversionService conversionService;
+    private final UserService userService;
 
     private String extractJwtFromCookies(HttpServletRequest request) {
         if (request.getCookies() != null) {
@@ -49,6 +51,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         return null;
+    }
+
+    private void resetCookie(@NonNull HttpServletResponse response,@NonNull HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            Cookie deleteCookie = new Cookie(cookie.getName(), "");
+            deleteCookie.setMaxAge(0); // Expira inmediatamente
+            deleteCookie.setPath("/"); // Asegúrate de que coincida con el path usado para setearla
+            deleteCookie.setHttpOnly(cookie.isHttpOnly());
+            deleteCookie.setSecure(cookie.getSecure());
+            response.addCookie(deleteCookie);
+        }
     }
 
     @Override
@@ -145,17 +159,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         logger.info("Is expired " + token.isExpired());
 
         if(isTokenExpiredOrRevoked && path.startsWith("/admin")) {
-            Cookie[] cookies = request.getCookies();
-            for (Cookie cookie : cookies) {
-                Cookie deleteCookie = new Cookie(cookie.getName(), "");
-                deleteCookie.setMaxAge(0); // Expira inmediatamente
-                deleteCookie.setPath("/"); // Asegúrate de que coincida con el path usado para setearla
-                deleteCookie.setHttpOnly(cookie.isHttpOnly());
-                deleteCookie.setSecure(cookie.getSecure());
-                response.addCookie(deleteCookie);
-            }
+            resetCookie(response, request);
             filterChain.doFilter(request, response);
             return;
+        } else if (!isTokenExpiredOrRevoked && path.startsWith("/admin/")) {
+            String username = userDetails.getUsername();
+            Usuario usuario = userService.getUserByEmail(username);
+            logger.info("User: " + usuario.getRoles().toString());
+            logger.info(usuario.getRoles().stream().filter(role -> role.getName().equals("ROLE_ADMIN")).count());
+            if(usuario.getRoles().stream().noneMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
+                resetCookie(response, request);
+                filterChain.doFilter(request, response);
+                return;
+            }
         }
 
         if (!isTokenExpiredOrRevoked) {
