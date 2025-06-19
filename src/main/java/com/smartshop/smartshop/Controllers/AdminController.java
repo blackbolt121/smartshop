@@ -1,7 +1,9 @@
 package com.smartshop.smartshop.Controllers;
 
 import com.smartshop.smartshop.Models.Cart;
+import com.smartshop.smartshop.Models.Producto;
 import com.smartshop.smartshop.Models.Usuario;
+import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.Services.AuthService;
 import com.smartshop.smartshop.Services.CartService;
 import com.smartshop.smartshop.Services.JwtService;
@@ -12,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -32,6 +36,7 @@ public class AdminController {
     private final UserService userService;
     private final JwtService jwtService;
     private final CartService cartService;
+    private final ProductRepository productRepository;
 
     @GetMapping("")
     public String index(){
@@ -46,7 +51,7 @@ public class AdminController {
     }
 
     @GetMapping("login")
-    public String login(@RequestParam(required = false, defaultValue = "false") boolean error, Model model, @CookieValue(value = "access_token", required = false) String token) {
+    public String login(@RequestParam(required = false, defaultValue = "false") boolean error, Model model, @CookieValue(value = "access_token", required = false) String token, HttpServletRequest request, HttpServletResponse response) {
 
         if(token == null){
             log.info("Redirecting to login...");
@@ -55,6 +60,19 @@ public class AdminController {
         if(token != null){
             log.info(token);
             String username = jwtService.extractUsername(token);
+            Usuario usuario = userService.getUserByEmail(username);
+            if(!jwtService.isTokenValid(token, usuario)){
+                if (request.getCookies() != null) {
+                    for (Cookie cookie : request.getCookies()) {
+                        cookie.setValue("");
+                        cookie.setPath("/");
+                        cookie.setMaxAge(0);
+                        response.addCookie(cookie);
+                    }
+                }
+                return "redirect:/admin/login";
+            };
+
             log.info(username);
             Usuario u = userService.getUserByEmail(username);
             if(u != null){
@@ -96,8 +114,27 @@ public class AdminController {
 
 
     @GetMapping("/dashboard")
-    public String dashboard(@CookieValue(value = "adminId") String id, Model model) {
-        model.addAttribute("usuario", userService.getUserByContext().getName());
+    public String dashboard(@CookieValue(value = "adminId") String id, Model model, HttpServletResponse response, HttpServletRequest request) {
+        Usuario u = userService.getUserByEmail(id);
+        try{
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.getAuthentication().getCredentials();
+        }catch(Exception e){
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    Cookie deleteCookie = new Cookie(cookie.getName(), "");
+                    deleteCookie.setMaxAge(0); // Expira inmediatamente
+                    deleteCookie.setPath("/"); // Asegúrate de que coincida con el path usado para setearla
+                    deleteCookie.setHttpOnly(cookie.isHttpOnly());
+                    deleteCookie.setSecure(cookie.getSecure());
+                    response.addCookie(deleteCookie);
+                }
+            }
+            log.info("Redirecting to Login");
+            return "login";
+        }
+        model.addAttribute("usuario", u);
         return "panel";
     }
 
@@ -131,6 +168,25 @@ public class AdminController {
         return "redirect:/admin/login";
     }
 
+    @GetMapping("/rest/logout")
+    public ResponseEntity<String> logoutAPI(@CookieValue(name = "access_token") String token, HttpServletResponse response, HttpServletRequest request) {
+        jwtService.revokeToken(token, userService.getUserByContext());
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                Cookie deleteCookie = new Cookie(cookie.getName(), "");
+                deleteCookie.setMaxAge(0); // Expira inmediatamente
+                deleteCookie.setPath("/"); // Asegúrate de que coincida con el path usado para setearla
+                deleteCookie.setHttpOnly(cookie.isHttpOnly());
+                deleteCookie.setSecure(cookie.getSecure());
+                response.addCookie(deleteCookie);
+            }
+        }
+        JSONObject obj = new JSONObject();
+        obj.put("status", "ok");
+        return ResponseEntity.ok(obj.toString());
+    }
+
     @GetMapping("/order/{id}")
     public String order(@PathVariable String id, Model model) {
         Cart cart = cartService.getCartById(id);
@@ -157,6 +213,13 @@ public class AdminController {
         model.addAttribute("usuario", usuario);
 
         return "usuario-editar";
+    }
+
+    @GetMapping("/quotes")
+    public String showQuotesForm(Model model) {
+        List<Producto> productos = productRepository.findAll();
+        model.addAttribute("productos", productos);
+        return "cotizador";
     }
 
     @PostMapping("/users/save")

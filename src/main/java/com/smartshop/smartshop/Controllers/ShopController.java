@@ -38,4 +38,9 @@ public class ShopController {
     public String producto() {
         return "forward:/index.html";
     }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "forward:/index.html";
+    }
 }

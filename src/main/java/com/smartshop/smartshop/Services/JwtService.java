@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.Map;
+import com.smartshop.smartshop.Models.Token;
 
 @Service
 public class JwtService {
@@ -81,6 +82,11 @@ public class JwtService {
         return true;
     }
 
+    public boolean revokeToken(final Token token, final Usuario usuario) {
+        token.setRevoked(true);
+        tokenRepository.save(token);
+        return true;
+    }
     private SecretKey getSignInKey(){
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);

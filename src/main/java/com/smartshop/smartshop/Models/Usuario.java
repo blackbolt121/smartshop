@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Set;
 
 
 @Data
@@ -52,6 +52,10 @@ public class Usuario {
 
     @Column
     private LocalDateTime updatedAt;
+
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles;
 
     @PrePersist
     protected void onCreate() {

@@ -3,3 +3,19 @@
   color: black; /* Cambia esto al color que quieras */
   font-size: 24px; /* Opcional: cambia el tamaño de la flecha */
 }
+
+/* Carousel.css */
+
+.slick-slide > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1;
+  height: 800px; /* Puedes ajustar la altura a lo que necesites */
+}
+
+.slick-slide img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}

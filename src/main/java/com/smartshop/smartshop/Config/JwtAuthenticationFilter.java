@@ -1,13 +1,16 @@
 package com.smartshop.smartshop.Config;
 
+import com.smartshop.smartshop.Models.Token;
 import com.smartshop.smartshop.Models.Usuario;
 import com.smartshop.smartshop.Repositories.TokenRepository;
 import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kong.unirest.core.Cookies;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.convert.ConversionService;
@@ -133,18 +136,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
         final boolean isTokenExpiredOrRevoked = tokenRepository.findByToken(jwt)
-                .map(token -> !token.isExpired() && !token.isRevoked())
+                .map(token -> (token.isExpired() || token.isRevoked()))
                 .orElse(false);
-
+        Token token = tokenRepository.findByToken(jwt).orElse(null);
         logger.info("isTokenExpiredOrRevoked: " + isTokenExpiredOrRevoked);
+        logger.info("Token: " + jwt);
+        logger.info("Is revoked " + token.isRevoked());
+        logger.info("Is expired " + token.isExpired());
 
-        if(!isTokenExpiredOrRevoked && path.startsWith("/admin")) {
-            response.sendRedirect(request.getContextPath() + "/admin/login");
+        if(isTokenExpiredOrRevoked && path.startsWith("/admin")) {
+            Cookie[] cookies = request.getCookies();
+            for (Cookie cookie : cookies) {
+                Cookie deleteCookie = new Cookie(cookie.getName(), "");
+                deleteCookie.setMaxAge(0); // Expira inmediatamente
+                deleteCookie.setPath("/"); // Asegúrate de que coincida con el path usado para setearla
+                deleteCookie.setHttpOnly(cookie.isHttpOnly());
+                deleteCookie.setSecure(cookie.getSecure());
+                response.addCookie(deleteCookie);
+            }
             filterChain.doFilter(request, response);
             return;
         }
 
-        if (isTokenExpiredOrRevoked) {
+        if (!isTokenExpiredOrRevoked) {
             final Optional<Usuario> user = userRepository.findByEmail(userEmail);
             logger.info("User: " + user.get().getId());
             final boolean isTokenValid = jwtService.isTokenValid(jwt, user.get());

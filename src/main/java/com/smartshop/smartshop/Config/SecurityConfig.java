@@ -71,7 +71,7 @@ public class SecurityConfig {
                                         "/checkout")
                                 .permitAll()
                                 .requestMatchers("/admin/login",
-                                        "/admin")
+                                        "/admin", "/admin/**")
                                 .permitAll()
                                 .requestMatchers("/auth/**")
                                 .permitAll()

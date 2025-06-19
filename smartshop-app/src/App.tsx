@@ -17,6 +17,7 @@ import { Footer } from './components/Footer';
 import { ProductPage } from './components/Product/ProductPage';
 import Cart from './components/Cart';
 import { useLocation } from 'react-router-dom';
+import Logout from './components/Logout';
 
 function App() {
 
@@ -46,7 +47,7 @@ function App() {
             <Route path={"/explorar"} element={<>Catalogo de Productos</>} />
             <Route path='/login' element={<Login />} />
             <Route path='/signup' element={<Signup />} />
-            <Route path='/logout' element={<Typography>Session closed</Typography>} />
+            <Route path='/logout' element={<Logout/>} />
             <Route path='/admin' element={<Admin />} />
             <Route path='/admin/products' element={<ProductsAdmin />} />
             <Route path='/admin/vendors' element={<VendorsAdmin />} />
