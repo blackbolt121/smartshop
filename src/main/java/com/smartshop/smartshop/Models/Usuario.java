@@ -45,6 +45,7 @@ public class Usuario {
     private List<Token> tokenList;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean activo = true;
 
     @Column(updatable = false)

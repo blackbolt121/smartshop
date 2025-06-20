@@ -64,4 +64,40 @@ public class CartController {
         return ResponseEntity.ok().body("");
     }
 
+    @GetMapping("/order/{id}")
+    public ResponseEntity<CartResponseDto> getCart(@PathVariable String id) {
+
+        Cart cart = cartService.getCartById(id);
+
+        log.info("getCart: {}", cart);
+
+        if (cart == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(cartService.toDto(cart));
+    }
+
+    @PutMapping("/order/{id}")
+    public ResponseEntity<CartResponseDto> setCart(@PathVariable String id, @RequestBody CartItemRequest[] itemRequest) {
+
+        Cart cart = cartService.getCartById(id);
+
+        log.info("setCart: {}", cart.getItems());
+
+        Usuario usuario = userService.getUserByContext();
+
+        if(!usuario.getId().equals(cart.getUsuario().getId())){
+            return ResponseEntity.status(404).build();
+        }
+
+        if (cart == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        cartService.updateCart(itemRequest, cart);
+
+        return ResponseEntity.ok().body(cartService.toDto(cart));
+    }
+
 }

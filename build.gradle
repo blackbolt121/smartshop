@@ -35,6 +35,7 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	implementation 'com.resend:resend-java:2.0.0'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	compileOnly 'org.projectlombok:lombok'

@@ -15,9 +15,6 @@
                 NetPay.setSandboxMode(true);
                 window.onPaymentSuccess = function (r) {
                     console.log('Pago exitoso:', r);
-
-
-
                     const access_token = getAccessToken();
                     const queryParams = new URLSearchParams(window.location.search);
                     const cart = queryParams.get("cart");
@@ -105,20 +102,26 @@
             </tr>
             </tbody>
         </table>
-        <span class="text-xl font-bold">Total a pagar: $<span th:text="${#numbers.formatDecimal(price, 1, 'COMMA', 2, 'POINT')}"></span> MXN</span>
+        <div class="font-mono flex flex-col items-end">
+            <span class="text-md font-bold">Subtotal: $<span th:text="${#numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}"></span> MXN</span>
+            <span class="text-md font-bold">IVA: $<span th:text="${#numbers.formatDecimal(iva, 1, 'COMMA', 2, 'POINT')}"></span> MXN</span>
+            <span class="text-md font-bold">Envio: $<span th:text="${#numbers.formatDecimal(envio, 1, 'COMMA', 2, 'POINT')}"></span> MXN</span>
+            <span class="text-md font-bold">Total a pagar: <span class="text-green-600">$</span><span class="text-green-600" th:text="${#numbers.formatDecimal(price, 1, 'COMMA', 2, 'POINT')}"></span> <span class="text-green-600">MXN</span></span>
+        </div>
         <button class="p-1 w-1/4" th:if="${cart.getOrdenPago == null}"
                 id="netpay-checkout"
                 data-button-title="Pagar"
-                data-street1="Filosofos 100"
-                data-country="MX"
-                data-city="Monterrey"
-                data-postal-code="64700"
-                data-state="NL"
+
                 th:attr="data-token=${token},
-                data-phone-number=${cart.getUsuario().getId()},
+                data-street1=${cart.getUsuario().getCalle()},
+                data-country=${cart.getUsuario().getPais()},
+                data-city=${cart.getUsuario().getCiudad()},
+                data-postal-code=${cart.getUsuario().getCodigoPostal()},
+                data-phone-number=${cart.getUsuario().getTelefono()},
                 data-email=${cart.getUsuario().getEmail()},
                 data-product-count=${cart.getItems().size()},
-                data-merchant-reference-code=${cart.getId()}"
+                data-merchant-reference-code=${cart.getId()},
+                data-state=${cart.getUsuario().getEstado()}"
                 data-onsuccess="onPaymentSuccess"
                 data-onerror="onPaymentError"
                 data-commerce-name="Urrea Shop"

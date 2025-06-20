@@ -36,8 +36,11 @@ public class PaymentController {
         if(opt_price.isEmpty()){
             return "redirect:/cart";
         }
-        double price = opt_price.get();
-        payload.put("amount", price);
+        double subtotal = opt_price.get();
+        double iva = subtotal * 0.16;
+        double envio = 500;
+        double total = subtotal + iva + envio;
+        payload.put("amount", total);
 
         HttpResponse<String> request = Unirest.post("https://gateway-154.netpaydev.com/gateway-ecommerce/v3/token/amount")
                 .header("Authorization", "sk_netpay_VcNiErfSqYMnxOZToQxxNYLFORdUHJZpyeFeZFoGsccny")
@@ -49,7 +52,10 @@ public class PaymentController {
 
         model.addAttribute("token", token);
         model.addAttribute("cartSize", carrito.getItems().stream().mapToInt(CartItem::getQuantity).sum());
-        model.addAttribute("price", price);
+        model.addAttribute("price", total);
+        model.addAttribute("iva", iva);
+        model.addAttribute("envio", envio);
+        model.addAttribute("subtotal", subtotal);
         model.addAttribute("cart", carrito);
         return "NetPay2";
     }

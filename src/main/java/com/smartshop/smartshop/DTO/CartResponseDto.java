@@ -4,5 +4,6 @@ import java.util.List;
 
 public record CartResponseDto(
         Long cartId,
-        List<CartItemDto> items
+        List<CartItemDto> items,
+        String ordenPago
 ) {}

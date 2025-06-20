@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 @Data
 @Builder
@@ -26,6 +27,7 @@ public class Token {
     private String token;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private TokenType tokenType = TokenType.BEARER;
 
     private boolean revoked;

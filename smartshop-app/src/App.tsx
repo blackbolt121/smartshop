@@ -18,11 +18,56 @@ import { ProductPage } from './components/Product/ProductPage';
 import Cart from './components/Cart';
 import { useLocation } from 'react-router-dom';
 import Logout from './components/Logout';
+import { useDispatch } from "react-redux";
+import { clearCart } from "./store/cartSlice";
 
 function App() {
 
   const navigate = useNavigate()
   const location = useLocation()
+  const dispatch = useDispatch();
+
+  async function validateCart() {
+  
+      let cartId = localStorage.getItem("cartId")
+  
+      let flag = false
+  
+      if (cartId != null) {
+
+        console.log(cartId)
+        
+        let createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+          {
+            method: "GET",
+            headers: {
+              "Accept": "application/json",
+              "Authorization": `Bearer ${getAccessToken()}`
+            }
+          }
+        )
+  
+  
+        let data = await createCart.json()
+  
+        let ordenPago = data.ordenPago
+  
+        flag = !(ordenPago === null)
+  
+        console.log(flag)
+        console.log(ordenPago)
+        if (flag) {
+          dispatch(clearCart())
+          localStorage.removeItem("cartId")
+        }
+      }else{
+        console.log("No cart assigned")
+      }
+    }
+
+  useEffect(() => {
+    validateCart().catch()
+  }, [])
 
   useEffect(() => {
     

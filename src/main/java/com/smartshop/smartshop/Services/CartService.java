@@ -8,6 +8,7 @@ import com.smartshop.smartshop.Repositories.CartRepository;
 import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.RequestModels.CartItemRequest;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CartService {
@@ -24,6 +26,39 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productoRepository;
 
+
+    public Cart updateCart(CartItemRequest[] cartItemRequest, Cart cart) {
+        log.info("Updating cart for cart id {}", cart.getId());
+
+        // 1. Obtener y limpiar la colección gestionada actual
+        Set<CartItem> items = cart.getItems();
+        items.clear(); // activa orphanRemoval
+
+        // 2. Agregar nuevos ítems directamente a la colección existente
+        for (CartItemRequest cartItemRequest1 : cartItemRequest) {
+            try {
+                log.info("Updating cart item {}", cartItemRequest1);
+
+                Producto product = productoRepository.findById(cartItemRequest1.productId())
+                        .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+                CartItemId cartItemId = new CartItemId(cart.getId(), product.getId());
+
+                CartItem cartItem = CartItem.builder()
+                        .id(cartItemId)
+                        .cart(cart)
+                        .product(product)
+                        .quantity(cartItemRequest1.quantity())
+                        .build();
+
+                items.add(cartItem); // 👈 usar la colección gestionada original
+            } catch (Exception e) {
+                log.warn("Error al agregar item al carrito", e);
+            }
+        }
+
+        return cartRepository.save(cart);
+    }
 
     public Cart createCart(CartItemRequest[] cartItemRequest, Usuario usuario) {
         Cart cart = new Cart();
@@ -67,7 +102,7 @@ public class CartService {
                 ))
                 .toList();
 
-        return new CartResponseDto(cart.getId(), itemDtos);
+        return new CartResponseDto(cart.getId(), itemDtos, cart.getOrdenPago());
     }
 
     public List<Cart> getAllCarts() {
