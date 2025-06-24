@@ -23,12 +23,63 @@
     <a th:href="@{/admin/logout}" class="block px-4 py-2 rounded hover:bg-red-100 text-red-600">Cerrar sesión</a>
   </nav>
 </div>
-
 <div class="py-10 w-[90%]">
   <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-lg">
+    <div class="border-b border-gray-300 mb-4 flex flex-col items-center">
+      <nav class="flex space-x-4" aria-label="Tabs">
+        <a
+                href="/admin/quotes"
+                class="py-2 px-4 text-sm font-medium hover:text-gray-700 hover:border-gray-300 border-b-2 border-blue-500 text-blue-600"
+        >
+          Cotizador
+        </a>
+        <a
+                href="/admin/quotes/all"
+                class="py-2 px-4 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 border-b-2 border-transparent"
+                th:classappend="${activeTab == 'list'} ? ' border-blue-500 text-blue-600' : ''"
+        >
+          Cotizaciones
+        </a>
+      </nav>
+    </div>
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Cotizador de Productos</h1>
+    <form id="formCotizacion" method="POST" action="/admin/quotes">
+      <!-- Aquí se inyectarán inputs ocultos con datos antes de enviar -->
+      <div>
+        <label for="nombre" class="block text-gray-700 font-medium mb-1">Nombre</label>
+        <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                placeholder="Nombre del cliente"
+                required
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input type="hidden" name="productoSeleccionados" id="productoSeleccionados" value=""/>
+      </div>
 
+      <!-- Campo de correo -->
+      <div>
+        <label for="correo" class="block text-gray-700 font-medium mb-1">Correo electrónico</label>
+        <input
+                type="email"
+                id="correo"
+                name="correo"
+                placeholder="cliente@ejemplo.com"
+                required
+                class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div class="mt-6 text-left">
+        <button id="btnEnviar" type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Enviar Cotización por Email
+        </button>
+      </div>
+    </form>
     <!-- Buscador -->
+
+    <br>
+    <br>
     <div class="mb-6 relative">
       <input
               type="text"
@@ -59,16 +110,13 @@
       <div class="mt-6 text-right space-y-1">
         <p class="text-gray-700">Subtotal: <span id="subtotal" class="font-semibold">$0.00</span></p>
         <p class="text-gray-700">IVA (16%): <span id="iva" class="font-semibold">$0.00</span></p>
+        <p class="text-gray-700">IVA (16%): <span id="envio" class="font-semibold">$500.00</span></p>
         <p class="text-xl font-bold text-gray-900">Total: <span class="text-green-600" id="total">$0.00</span></p>
       </div>
     </div>
   </div>
-  <form id="formCotizacion" method="POST" action="/enviar-cotizacion" style="display:none;">
-    <!-- Aquí se inyectarán inputs ocultos con datos antes de enviar -->
-  </form>
-  <button id="btnEnviar" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-    Enviar Cotización por Email
-  </button>
+
+
 </div>
 
 <script th:inline="javascript">

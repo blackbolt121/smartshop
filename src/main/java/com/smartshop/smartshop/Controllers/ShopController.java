@@ -43,4 +43,9 @@ public class ShopController {
     public String signup() {
         return "forward:/index.html";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "forward:/index.html";
+    }
 }

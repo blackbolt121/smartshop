@@ -71,12 +71,8 @@ public class PromotionAdminController {
     public String updatePromotion(@PathVariable String id,
                                   @ModelAttribute Promotion updatedPromo,
                                   @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
-        log.info("Updating promotion: " + id);
-        log.info("Updating promotion: " + updatedPromo.getTitle());
         Optional<Promotion> promoOpt = promotionService.getById(id);
-        log.info(promoOpt.toString());
         if (promoOpt.isEmpty()) return "redirect:/admin/promotions";
-
         Promotion promotion = promoOpt.get();
         promotion.setTitle(updatedPromo.getTitle());
         promotion.setStartDate(updatedPromo.getStartDate());
@@ -85,7 +81,8 @@ public class PromotionAdminController {
         promotion.setActive(updatedPromo.isActive());
 
         try{
-            if (imageFile != null) {
+            log.info(String.format("Is promotion image empty? %s", String.valueOf(imageFile.isEmpty())));
+            if (!imageFile.isEmpty()) {
                 byte[] image = imageFile.getBytes();
                 promotion.setImage(image);
             }

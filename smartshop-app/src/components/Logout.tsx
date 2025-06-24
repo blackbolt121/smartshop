@@ -1,23 +1,18 @@
-import axios from "axios";
 import { useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 const Logout = () => {
+
+    const navigate = useNavigate()
  
     useEffect(()=> {
-        axios.get("/admin/rest/logout", {
-            withCredentials: true
-        }).then((data)=>{
-            console.log(data)
-        })
-        .catch(error => {
-            console.log(error)
-        })
+        localStorage.removeItem("access_token")
+        navigate("/login")
     }, [])
 
     return <>
         <div>
-            Loggin out...∫
+            Loggin out...
         </div>
     </>
 }

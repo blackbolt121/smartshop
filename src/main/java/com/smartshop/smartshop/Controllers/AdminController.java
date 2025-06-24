@@ -1,8 +1,9 @@
 package com.smartshop.smartshop.Controllers;
 
-import com.smartshop.smartshop.Models.Cart;
-import com.smartshop.smartshop.Models.Producto;
-import com.smartshop.smartshop.Models.Usuario;
+import com.resend.services.emails.model.SendEmailRequest;
+import com.resend.services.emails.model.SendEmailResponse;
+import com.smartshop.smartshop.Models.*;
+import com.smartshop.smartshop.Repositories.CotizacionRepository;
 import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.Services.AuthService;
 import com.smartshop.smartshop.Services.CartService;
@@ -12,7 +13,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.resend.*;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -38,6 +37,7 @@ public class AdminController {
     private final JwtService jwtService;
     private final CartService cartService;
     private final ProductRepository productRepository;
+    private final CotizacionRepository cotizacionRepository;
 
     @GetMapping("")
     public String index(){
@@ -231,6 +231,62 @@ public class AdminController {
         return "cotizador";
     }
 
+    @PostMapping("/quotes")
+    public String sendQuote(@RequestParam String correo, @RequestParam String nombre, @RequestParam String productoSeleccionados, Model model) {
+
+        Resend resend = new Resend("");
+
+        JSONObject obj = new JSONObject(productoSeleccionados);
+
+
+        // Crear nueva cotización
+        Cotizacion cotizacion = new Cotizacion();
+        cotizacion.setNombre(nombre);
+        cotizacion.setCorreo(correo);
+        cotizacion.setItems(new ArrayList<>());
+
+        // Parsear JSON con los productos seleccionados
+
+        obj.keys().forEachRemaining(key -> {
+            Producto producto = productRepository.findById(key).orElse(null);
+            if (producto != null) {
+                Integer quantity = obj.getJSONObject(key).getInt("cantidad");
+                QuoteItem quoteItem = QuoteItem.builder()
+                        .product(producto)
+                        .quantity(quantity)
+                        .cotizacion(cotizacion) // importante para la relación
+                        .build();
+                cotizacion.getItems().add(quoteItem);
+            }
+        });
+
+        // Guardar cotización y sus items en cascada
+        cotizacionRepository.save(cotizacion);
+
+        String html = this.generarHtmlCotizacion(cotizacion);
+
+        SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
+                .from("onboarding@resend.dev")
+                .to("rego199903@gmail.com")
+                .subject(String.format("Cotizacion: %s", cotizacion.getId()))
+                .html(html)
+                .build();
+
+        SendEmailResponse data = resend.emails().send(sendEmailRequest);
+
+        List<Producto> productos = productRepository.findAll();
+        model.addAttribute("productos", productos);
+
+        return "cotizador";
+    }
+
+    @GetMapping("/quotes/all")
+    public String showAllQuotes(Model model) {
+
+
+        return "cotizaciones";
+    }
+
     @PostMapping("/users/save")
     public String actualizarUsuario(@ModelAttribute Usuario usuario) {
 
@@ -255,5 +311,51 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    public String generarHtmlCotizacion(Cotizacion cotizacion) {
+        StringBuilder html = new StringBuilder();
 
+        double subtotal = 0;
+        double envio = 500;
+
+        html.append("<div style=\"font-family: Arial, sans-serif; max-width: 700px; margin: auto;\">");
+        html.append("<h2 style=\"color: #1d4ed8;\">Cotización de Productos</h2>");
+        html.append("<table style=\"width: 100%; border-collapse: collapse; margin-top: 20px;\">");
+        html.append("<thead><tr>")
+                .append("<th style=\"text-align: left; border-bottom: 1px solid #ccc; padding: 8px;\">Imagen</th>")
+                .append("<th style=\"text-align: left; border-bottom: 1px solid #ccc; padding: 8px;\">Producto</th>")
+                .append("<th style=\"text-align: center; border-bottom: 1px solid #ccc; padding: 8px;\">Cantidad</th>")
+                .append("<th style=\"text-align: right; border-bottom: 1px solid #ccc; padding: 8px;\">Precio</th>")
+                .append("<th style=\"text-align: right; border-bottom: 1px solid #ccc; padding: 8px;\">Total</th>")
+                .append("</tr></thead><tbody>");
+
+        for (QuoteItem p : cotizacion.getItems()) {
+            double totalProducto = p.getProduct().getPrice() * p.getQuantity();
+            subtotal += totalProducto;
+
+            html.append("<tr>")
+                    .append("<td style=\"padding: 8px;\"><img src=\"").append(p.getProduct().getImageUrl()).append("\" width=\"60\"/></td>")
+                    .append("<td style=\"padding: 8px;\">").append(p.getProduct().getName()).append("<br/><small>").append(p.getProduct().getDescription()).append("</small></td>")
+                    .append("<td style=\"padding: 8px; text-align: center;\">").append(p.getQuantity()).append("</td>")
+                    .append("<td style=\"padding: 8px; text-align: right;\">$").append(String.format("%.2f", p.getProduct().getPrice())).append("</td>")
+                    .append("<td style=\"padding: 8px; text-align: right;\">$").append(String.format("%.2f", totalProducto)).append("</td>")
+                    .append("</tr>");
+        }
+
+        double iva = subtotal * 0.16;
+        double total = subtotal + iva + envio;
+
+        html.append("</tbody></table>");
+
+        // Totales
+        html.append("<div style=\"margin-top: 30px; text-align: right;\">")
+                .append("<p style=\"margin: 4px 0;\">Subtotal: <strong>$").append(String.format("%.2f", subtotal)).append("</strong></p>")
+                .append("<p style=\"margin: 4px 0;\">IVA (16%): <strong>$").append(String.format("%.2f", iva)).append("</strong></p>")
+                .append("<p style=\"margin: 4px 0;\">Envío: <strong>$").append(String.format("%.2f", envio)).append("</strong></p>")
+                .append("<p style=\"margin: 8px 0; font-size: 18px; color: #10b981;\">Total: <strong>$").append(String.format("%.2f", total)).append("</strong></p>")
+                .append("</div>");
+
+        html.append("</div>");
+        return html.toString();
+    }
 }
+

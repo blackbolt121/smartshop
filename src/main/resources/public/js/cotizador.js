@@ -81,7 +81,7 @@ function renderTabla() {
     });
 
     const iva = subtotal * 0.16;
-    const total = subtotal + iva;
+    const total = subtotal + iva + 500;
 
     document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
     document.getElementById("iva").textContent = `$${iva.toFixed(2)}`;
@@ -98,3 +98,14 @@ function renderTabla() {
         });
     });
 }
+
+
+
+let form = document.querySelector("#formCotizacion")
+
+form.addEventListener("submit", (event)=>{
+    event.preventDefault();
+    let productos = document.querySelector("#productoSeleccionados")
+    productos.value = JSON.stringify(productosSeleccionados)
+    form.submit()
+})
