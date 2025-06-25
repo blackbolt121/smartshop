@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface CotizacionRepository extends JpaRepository<Cotizacion, String> {
     List<Cotizacion> findAllByCorreo(String correo);
-    Optional<Cotizacion> findByCorreoOrId(String correo);
+    Optional<Cotizacion> findByCorreoOrId(String correo, String id);
 }

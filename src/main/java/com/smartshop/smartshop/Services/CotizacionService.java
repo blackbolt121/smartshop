@@ -41,7 +41,7 @@ public class CotizacionService {
     }
 
     public Optional<Cotizacion> findByCorreoOrId(String correo_id) {
-        return cotizacionRepository.findByCorreoOrId(correo_id);
+        return cotizacionRepository.findByCorreoOrId(correo_id, correo_id);
     }
 
 }
