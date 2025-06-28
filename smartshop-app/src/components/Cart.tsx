@@ -8,6 +8,9 @@ import { useNavigate } from "react-router-dom";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import CartItemCard from "./CartItemCard";
 
+
+
+
 const Cart = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -55,7 +58,7 @@ const Cart = () => {
       }
       else {
         console.log('Validando orden de pedido')
-        let createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+        const createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
           {
             method: "GET",
             headers: {
@@ -66,9 +69,9 @@ const Cart = () => {
         )
 
 
-        let data = await createCart.json()
+        const data = await createCart.json()
 
-        let ordenPago = data.ordenPago
+        const ordenPago = data.ordenPago
 
         console.log(ordenPago)
         console.log(flag)
@@ -90,7 +93,7 @@ const Cart = () => {
             "Authorization": `Bearer ${getAccessToken()}`
           },
           body: JSON.stringify(
-            cartItems.map(item => ({
+            cartItems.map((item: CartItem) => ({
               productId: item.id,
               quantity: item.quantity
             }))
@@ -109,7 +112,7 @@ const Cart = () => {
             "Authorization": `Bearer ${getAccessToken()}`
           },
           body: JSON.stringify(
-            cartItems.map(item => ({
+            cartItems.map((item: CartItem) => ({
               productId: item.id,
               quantity: item.quantity
             }))
@@ -136,12 +139,12 @@ const Cart = () => {
 
   async function validateCart() {
 
-    let cartId = localStorage.getItem("cartId")
+    const cartId = localStorage.getItem("cartId")
 
     let flag = false
 
     if (cartId != null) {
-      let createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+      const createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
         {
           method: "GET",
           headers: {
@@ -152,9 +155,9 @@ const Cart = () => {
       )
 
 
-      let data = await createCart.json()
+      const data = await createCart.json()
 
-      let ordenPago = data.ordenPago
+      const ordenPago = data.ordenPago
 
       flag = !(ordenPago === null)
 
@@ -184,7 +187,7 @@ const Cart = () => {
       ) : (
         <div className="flex flex-col gap-2">
           <div className="space-y-4">
-            {cartItems.map((item) => (
+            {cartItems.map((item: CartItem) => (
               <CartItemCard id={item.id} quantity={item.quantity} key={item.id} />
             ))}
           </div>

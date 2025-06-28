@@ -138,6 +138,7 @@ public class AuthService {
 
     public Boolean validateToken(@NotNull final String token) {
         final String username = jwtService.extractUsername(token);
+        log.info("Validating token for " + username);
         if (username == null) {
             return false;
         }

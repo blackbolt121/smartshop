@@ -10,8 +10,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1;
-  height: 800px; /* Puedes ajustar la altura a lo que necesites */
+  height: 600px; /* Puedes ajustar la altura a lo que necesites */
 }
 
 .slick-slide img {

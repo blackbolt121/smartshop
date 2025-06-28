@@ -6,6 +6,7 @@ import logo from "../assets/urreastroe.png" //"../assets/smarshop.png"
 import { getAccessToken } from "../store/auth";
 import { useSelector } from "react-redux";
 import { RootState } from '../store/store';
+import UserProfile from "../UserProfile.tsx";
 
 
 
@@ -60,7 +61,7 @@ const Navbar = () => {
                 </Badge>
             </IconButton>
           </Link>
-          <Button variant="outlined" color="danger" sx={{ color: "black" }} className="text-white hover:bg-red-500 hover:text-black" onClick={async () => {
+          {(getAccessToken())? <UserProfile userName={"Ruben Garcia"}/> : <Button variant="outlined" color="danger" sx={{ color: "black" }} className="text-white hover:bg-red-500 hover:text-black" onClick={async () => {
             if (getAccessToken()) {
               localStorage.removeItem("access_token")
               localStorage.removeItem("refresh_token")
@@ -70,10 +71,10 @@ const Navbar = () => {
             }else {
               navigate("/login")
             }
-            
+
           }}>
             {logText}
-          </Button>
+          </Button>}
         </div>
           
         {/* Mobile Menu Icon */}
@@ -92,6 +93,7 @@ const Navbar = () => {
             <Link to="/about" className="hover:text-indigo-200 transition-colors">About</Link>
             <Link to="/contact" className="hover:text-indigo-200 transition-colors">Contact</Link>
             <Link to="/tienda" className="hover:text-indigo-200 transition-colors">Tienda</Link>
+            <UserProfile userName={"Ruben Garcia"}/>
             <Button variant="outlined" sx={{ color: "white" }} className="text-white hover:bg-white hover:text-black" onClick={async () => {
               if (getAccessToken()) {
                 localStorage.removeItem("access_token")

@@ -43,7 +43,7 @@ const Login = () => {
         setError("Email or password is incorrect");
         return;
       }
-      let credentials: TokenPayload = auth.data;
+      const credentials: TokenPayload = auth.data;
       saveTokens(credentials.access_token, credentials.refresh_token);
       navigate("/"); // Redirect to home after login
     }catch (error) {

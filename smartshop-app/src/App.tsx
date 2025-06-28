@@ -10,10 +10,10 @@ import { ProductsAdmin } from './components/AdminComponents/ProductsAdmin';
 import { VendorsAdmin } from './components/AdminComponents/VendorsAdmin';
 import About from './components/About';
 import ContactPage from './components/ContactPage';
-import { getAccessToken } from './store/auth';
+import {getAccessToken, removeTokens, validateToken} from './store/auth';
 import { useEffect } from 'react';
 import { Tienda } from './components/Tienda/Tienda';
-import { Footer } from './components/Footer';
+import Footer from './components/Footer';
 import { ProductPage } from './components/Product/ProductPage';
 import Cart from './components/Cart';
 import { useLocation } from 'react-router-dom';
@@ -28,8 +28,8 @@ function App() {
   const dispatch = useDispatch();
 
   async function validateCart() {
-  
-      let cartId = localStorage.getItem("cartId")
+
+      const cartId = localStorage.getItem("cartId")
   
       let flag = false
   
@@ -37,7 +37,7 @@ function App() {
 
         console.log(cartId)
         
-        let createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+        const createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
           {
             method: "GET",
             headers: {
@@ -48,9 +48,9 @@ function App() {
         )
   
   
-        let data = await createCart.json()
+        const data = await createCart.json()
   
-        let ordenPago = data.ordenPago
+        const ordenPago = data.ordenPago
   
         flag = !(ordenPago === null)
   
@@ -71,9 +71,22 @@ function App() {
 
   useEffect(() => {
     
-    let path = location.pathname
+    const path = location.pathname
 
-    console.log(path)
+    console.log(path);
+
+    validateToken().then( (validation: boolean) => {
+        if(!validation){
+            console.log('Token is invalid')
+            removeTokens()
+        }else{
+            console.log("Token valid")
+        }
+    }).catch((error)=>{
+        console.log(error)
+        console.log("Failed to validate");
+        removeTokens();
+    });
 
     if(getAccessToken() === null){
       if(location.pathname.startsWith("/cart")){

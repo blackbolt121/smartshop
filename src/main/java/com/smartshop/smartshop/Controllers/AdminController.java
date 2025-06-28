@@ -234,7 +234,7 @@ public class AdminController {
     @PostMapping("/quotes")
     public String sendQuote(@RequestParam String correo, @RequestParam String nombre, @RequestParam String productoSeleccionados, Model model) {
 
-        Resend resend = new Resend("");
+        Resend resend = new Resend("re_fcfqJaWG_4VdJr8KzpWSwPX82y2gxw2ng");
 
         JSONObject obj = new JSONObject(productoSeleccionados);
 

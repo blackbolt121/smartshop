@@ -5,6 +5,7 @@ import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.AuthService;
 import com.smartshop.smartshop.Services.JwtService;
 import com.smartshop.smartshop.Services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ public class AuthController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<String> validateToken(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authentication) {
+    public ResponseEntity<String> validateToken(@RequestHeader(value = HttpHeaders.AUTHORIZATION) final String authentication, HttpServletRequest request) {
         log.info("Auth token: " + authentication);
         if (authentication == null || authentication.isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -68,6 +69,7 @@ public class AuthController {
             return ResponseEntity.badRequest().build();
         }
         final String token = authentication.split(" ")[1];
+
         log.info(token);
         Boolean validation = authService.validateToken(token);
         log.info(validation.toString());

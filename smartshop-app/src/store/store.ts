@@ -65,7 +65,7 @@ const vendorSlice = createSlice({
       state.push(action.payload);
     },
     removeVendor: (state, action: PayloadAction<string>) => {
-      return state.filter((vendor) => vendor.vendorId !== action.payload);
+      return state.filter((vendor: Vendor) => vendor.vendorId !== action.payload);
     },
     updateVendor: (state, action: PayloadAction<Vendor>) => {
       const index = state.findIndex((vendor) => vendor.vendorId === action.payload.vendorId);
@@ -73,9 +73,8 @@ const vendorSlice = createSlice({
         state[index] = action.payload;
       }
     },
-    setVendors: (state, action: PayloadAction<Vendor[]>) => {
-      state
-      state = action.payload;
+    setVendors: (_state, action: PayloadAction<Vendor[]>) => {
+      return action.payload;
     }
   },
 });
