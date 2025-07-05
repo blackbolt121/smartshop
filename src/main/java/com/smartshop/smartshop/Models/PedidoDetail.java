@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @Entity
 @ToString(exclude = {"pedidos", "producto"}) // Excluye las referencias a los padres
-@EqualsAndHashCode(exclude = {"pedidos", "producto"}) // Excluye las referencias a los padres
+//@EqualsAndHashCode(exclude = {"pedidos", "producto"}) // Excluye las referencias a los padres
 public class PedidoDetail {
 
     @Id
