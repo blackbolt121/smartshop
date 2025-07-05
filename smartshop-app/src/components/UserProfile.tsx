@@ -1,12 +1,15 @@
-import {useState, useRef, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store/store.ts";
+import { loadUsuarioFromLocalStorage } from "../store/UserSlice.ts";
+import { FC } from "react";
 
-interface UserProfileProps {
-    userName: string;
-}
 
-const UserProfile: React.FC<UserProfileProps> = ({userName}: UserProfileProps) => {
+const UserProfile: FC = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const user = useSelector((state: RootState) => state.user.usuario);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     // Tipamos la referencia para que TypeScript sepa que es un elemento div
     const menuRef = useRef<HTMLDivElement>(null);
@@ -19,6 +22,9 @@ const UserProfile: React.FC<UserProfileProps> = ({userName}: UserProfileProps) =
         return initials.substring(0, 2).toUpperCase();
     };
 
+    useEffect(() => {
+        dispatch(loadUsuarioFromLocalStorage());
+    }, [dispatch]);
     // Tipamos el evento del listener
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -36,7 +42,7 @@ const UserProfile: React.FC<UserProfileProps> = ({userName}: UserProfileProps) =
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-                {getInitials(userName)}
+                {getInitials(user.name)}
             </button>
 
             {isOpen && (

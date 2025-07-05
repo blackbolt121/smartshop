@@ -2,8 +2,10 @@
 // import { Link } from "react-router-dom"
 // import { FaFacebook, FaInstagram, FaEnvelope, FaWhatsapp, FaPhone } from 'react-icons/fa';
 // import { FaXTwitter } from "react-icons/fa6";
-import logo from "../assets/urreastroe.png"
-import {useNavigate} from "react-router-dom";
+import {ReactNode} from "react";
+import logo from "../assets/mercadourrea.svg"
+import {Link} from "react-router-dom";
+
 
 
 interface FooterLinkProps {
@@ -13,7 +15,7 @@ interface FooterLinkProps {
 
 interface SocialLinkProps {
     href: string,
-    children: React.ReactNode,
+    children: ReactNode,
     ariaLabel: string,
 }
 const MapPinIcon = () => (
@@ -38,11 +40,12 @@ const WhatsAppIcon = () => (
 
 // Componente para un enlace del footer
 const FooterLink = ({ href, children }: FooterLinkProps) => {
-    const navigate = useNavigate()
     return <li>
-        <a onClick={()=>navigate(href)} className="text-red-200 hover:text-white hover:underline transition-colors duration-300">
+        <Link to={href} onClick={()=>{
+            console.log(href);
+        }} className="text-red-200 hover:text-white hover:underline transition-colors duration-300">
             {children}
-        </a>
+        </Link>
     </li>
 };
 
@@ -95,10 +98,10 @@ const Footer = () => {
                     <div>
                         <h3 className={`text-sm font-semibold ${colors.title} tracking-wider uppercase border-b-2 ${colors.border} pb-2 mb-4`}>Tienda</h3>
                         <ul className="space-y-3">
-                            <FooterLink href="#">Home</FooterLink>
-                            <FooterLink href="#">Acerca</FooterLink>
-                            <FooterLink href="#">Contacto</FooterLink>
-                            <FooterLink href="#">Tienda</FooterLink>
+                            <FooterLink href="/">Home</FooterLink>
+                            <FooterLink href="/about">Acerca</FooterLink>
+                            <FooterLink href="/contact">Contacto</FooterLink>
+                            <FooterLink href="/tienda">Tienda</FooterLink>
                         </ul>
                     </div>
 

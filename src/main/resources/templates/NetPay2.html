@@ -31,7 +31,7 @@
                         .catch(()=>{})
                 };
                 window.onPaymentError = function (r) {
-                    console.error('Error en el pago:', r);
+                    alert('Error en el pago:');
                 };
             };
 
@@ -94,7 +94,7 @@
             </thead>
             <tbody>
             <tr th:each="item : ${cart.getItems()}">
-                <td th:text="${item.getProduct().getId()}" class="p-2"></td>
+                <td th:text="${item.getProduct().getSku()}" class="p-2"></td>
                 <td th:text="${item.getProduct().getName()}" class="p-2"></td>
                 <td th:text="${item.getQuantity()}" class="p-2"></td>
                 <td class="p-2">$ <span th:text="${#numbers.formatDecimal(item.getProduct().getPrice(), 1, 'COMMA', 2, 'POINT')}"></span></td>

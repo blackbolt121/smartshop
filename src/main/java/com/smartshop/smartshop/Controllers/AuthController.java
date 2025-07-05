@@ -1,6 +1,8 @@
 package com.smartshop.smartshop.Controllers;
 
+import com.smartshop.smartshop.Models.Token;
 import com.smartshop.smartshop.Models.Usuario;
+import com.smartshop.smartshop.Repositories.TokenRepository;
 import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.AuthService;
 import com.smartshop.smartshop.Services.JwtService;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Logger;
+import com.smartshop.smartshop.DTO.UsuarioDTO;
 
 @Slf4j
 @CrossOrigin(origins = "*")
@@ -32,6 +35,8 @@ public class AuthController {
     private AuthService authService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private TokenRepository tokenRepository;
 
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@RequestBody RegisterRequest request) {
@@ -49,6 +54,28 @@ public class AuthController {
         Logger.getGlobal().info(request.password());
         final TokenResponse response = service.authenticate(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/myself")
+    public ResponseEntity<UsuarioDTO> myself(@RequestHeader(value = HttpHeaders.AUTHORIZATION) final String authentication){
+        log.info("Auth token: " + authentication);
+        if (authentication == null || authentication.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        log.info(authentication);
+        if(!authentication.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().build();
+        }
+        final String token = authentication.split(" ")[1];
+        Token token1 = tokenRepository.findByToken(token).orElse(null);
+        if(token1 == null){
+            return ResponseEntity.badRequest().build();
+        }
+        Usuario usuario = token1.getUsuario();
+
+        UsuarioDTO usuarioDTO = UsuarioDTO.fromEntity(usuario);
+
+        return ResponseEntity.ok(usuarioDTO);
     }
 
     @PostMapping("/refresh-token")

@@ -1,21 +1,22 @@
 package com.smartshop.smartshop.Models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 
-@Data
-@Entity
+@Getter // Anotaciones específicas en lugar de @Data
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@ToString(exclude = {"tokenList", "roles", "pedidos"}) // Excluye TODAS las relaciones en colección
+@EqualsAndHashCode(exclude = {"tokenList", "roles", "pedidos"})
 public class Usuario {
 
     @Id
@@ -57,6 +58,10 @@ public class Usuario {
 
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
+
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Pedidos> pedidos = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

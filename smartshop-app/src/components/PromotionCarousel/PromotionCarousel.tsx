@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 // import "./Carousel.css"
 import axios from 'axios';
 import { getAccessToken } from '../../store/auth';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface Promotion {
   id: number;
@@ -19,7 +20,7 @@ const PromotionsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(0); // Para controlar el slide actual
   const [image, setImage] = useState<string>("")
   const loadImages = async () => {
-    const images_request = await axios.get('http://localhost:8080/rest/api/1/promotions', {
+    const images_request = await axios.get(`${apiUrl}/rest/api/1/promotions`, {
       headers: {
         "Authorization": `Bearer ${getAccessToken()}`
       }

@@ -1,13 +1,12 @@
 package com.smartshop.smartshop.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import jakarta.persistence.Id;
 import com.smartshop.smartshop.Models.Vendor;
-import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 
@@ -16,11 +15,16 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Producto {
+@EqualsAndHashCode
+public class Producto  implements Serializable {
     @Id
-    private String Id;
+    @GeneratedValue
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID id;
     @Column(nullable = false)
     private String name;
+    @Column
+    private String sku;
     @Column( columnDefinition = "TEXT")
     private String description;
     private double price;
@@ -29,12 +33,13 @@ public class Producto {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;
-    @PrePersist
-    public void prePersist() {
-        if (this.Id == null) {
-            this.Id = UUID.randomUUID().toString();
-        }
-    }
+    @JsonIgnore
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "urrea_id")
+    private UrreaProduct urreaProduct;
+
     @Column
     private String category;
+    @Version
+    private Integer version;
 }

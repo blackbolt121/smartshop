@@ -1,5 +1,8 @@
 // Guardar los tokens en localStorage
 import axios from "axios";
+import {Usuario} from "./UserSlice.ts";
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export const saveTokens = (accessToken: string, refreshToken: string) => {
   localStorage.setItem('access_token', accessToken);
   localStorage.setItem('refresh_token', refreshToken);
@@ -25,23 +28,31 @@ export const removeTokens = () => {
 
 export async function validateToken() {
   const token = localStorage.getItem('access_token');
-  console.log(`Bearer ${token}`)
-  console.log('http://localhost:8080/auth/validate')
+
   const headers =  {
     Authorization: `Bearer ${token}`,
     Accept: "application/json",
   }
 
-  console.log(headers);
   try {
-    const response = await axios.post('http://localhost:8080/auth/validate',null,{
+    await axios.post(`${apiUrl}/auth/validate`,null,{
       headers: headers,
     });
-    console.log(response.status)
-    return true
-
   } catch {
-    console.log("Failed to validate token");
     return false;
+  }
+  
+  try{
+    const usuarioRequest = await axios.post(`${apiUrl}/auth/myself`, null, {
+      headers: headers
+    });
+    
+    const usuario: Usuario = usuarioRequest.data;
+    
+    localStorage.setItem("user", JSON.stringify(usuario));
+    return true
+  }catch {
+    console.log("Failed to load user data");
+    return true
   }
 }

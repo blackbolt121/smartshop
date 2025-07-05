@@ -12,7 +12,7 @@ import Add from '@mui/icons-material/Add';
 
 
 import { addToCart } from "../../store/cartSlice";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 export const ProductPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Product>();
@@ -22,9 +22,9 @@ export const ProductPage = () => {
   useEffect(() => {
     async function fetchProductDetails() {
       try {
-        console.log(`http://localhost:8080/rest/api/1/producto?id=${encodeURIComponent(id || "")}`)
+        console.log(`${apiUrl}/rest/api/1/producto?id=${encodeURIComponent(id || "")}`)
         const response = await axios.get<Product>(
-          `http://localhost:8080/rest/api/1/producto?id=${encodeURIComponent(id || "")}`,
+          `${apiUrl}/rest/api/1/producto?id=${encodeURIComponent(id || "")}`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -49,6 +49,7 @@ export const ProductPage = () => {
       id: String(product?.id) || "",
       name: product?.name || "",
       price: product?.price || 0.0,
+      sku: product?.sku || "",
       quantity: parseInt(data.get("number-units")?.toString() || "1")
     };
 
@@ -73,13 +74,16 @@ export const ProductPage = () => {
           {/* Detalles del producto */}
           <div className="flex flex-col lg:w-1/2">
             <Typography level="h4" className="text-gray-600">
-              {product.vendor.vendorName}
+              {(product.vendor)?product.vendor.vendorName : "Urrea"}
             </Typography>
             <Typography level="h1" className="font-bold text-3xl mb-2">
               {product.name}
             </Typography>
             <Typography level="body-lg" className="mb-4 text-gray-800">
               {product.description}
+            </Typography>
+            <Typography level="body-lg" className="mb-4 text-gray-800">
+              <strong>SKU:</strong> {product.sku}
             </Typography>
             <Typography level="h2" className="text-green-600 font-semibold text-2xl mb-4">
               {product.price.toLocaleString("es-MX", { style: "currency", currency: "MXN" })}

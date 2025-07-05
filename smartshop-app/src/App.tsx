@@ -20,6 +20,9 @@ import { useLocation } from 'react-router-dom';
 import Logout from './components/Logout';
 import { useDispatch } from "react-redux";
 import { clearCart } from "./store/cartSlice";
+import ScrollTop from "./components/ScrollTop.tsx";
+import PedidosLanding from "./components/Pedidos/PedidosLanding.tsx";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 function App() {
 
@@ -37,7 +40,7 @@ function App() {
 
         console.log(cartId)
         
-        const createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+        const createCart = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`,
           {
             method: "GET",
             headers: {
@@ -99,7 +102,8 @@ function App() {
   return (
     <>
       <div className='min-h-screen'>
-        <Navbar />
+          <Navbar />
+          <ScrollTop />
         <Routes>
             <Route path={"/"} element={<Home/>} />
             <Route path={"/explorar"} element={<>Catalogo de Productos</>} />
@@ -115,7 +119,7 @@ function App() {
             <Route path='/producto/:id' element={<ProductPage />} />
             <Route path='/cart' element={<Cart />} />
             <Route path='*' element={<Typography>404 Not Found</Typography>} />
-
+            <Route path={"/pedidos"} element={<PedidosLanding/>} />
         </Routes>
       </div>
       <Footer />

@@ -5,6 +5,7 @@ import com.smartshop.smartshop.Repositories.TokenRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.Map;
 import com.smartshop.smartshop.Models.Token;
 
+@Slf4j
 @Service
 public class JwtService {
 
@@ -25,12 +27,19 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+
+        log.info("Extracting username from token {}", token);
+        try{
+            return Jwts.parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        }catch (Exception e){
+            return "";
+        }
+
     }
     public boolean isTokenValid(String token, Usuario user) {
         final String username = extractUsername(token);

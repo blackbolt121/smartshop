@@ -4,6 +4,7 @@ import axios from "axios";
 import { Vendor } from "../../../store/store";
 import { getAccessToken } from "../../../store/auth";
 import { useNavigate } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const ProductCreate = () => {
     const navigate = useNavigate()
@@ -23,7 +24,7 @@ export const ProductCreate = () => {
 
     // Obtener la lista de vendors al cargar el componente
     useEffect(() => {
-        axios.get("http://localhost:8080/rest/api/1/vendor/all",
+        axios.get(`${apiUrl}/rest/api/1/vendor/all`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,7 +47,7 @@ export const ProductCreate = () => {
         }
 
         try {
-            await axios.post("http://localhost:8080/rest/api/1/producto", product, {
+            await axios.post(`${apiUrl}/rest/api/1/producto`, product, {
                 headers: {
                     'Content-Type': 'application/json',
                     "Authorization": "Bearer " + getAccessToken()

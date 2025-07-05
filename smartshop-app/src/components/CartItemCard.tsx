@@ -5,6 +5,7 @@ import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { getAccessToken } from "../store/auth";
 import { FaTrashCan } from "react-icons/fa6";
 
+const apiUrl = import.meta.env.VITE_API_URL;
 interface CartItemCardProps {
   id: string;
   quantity: number;
@@ -24,7 +25,7 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/rest/api/1/urrea/producto/${id}`, {
+    fetch(`${apiUrl}/rest/api/1/urrea/producto?codigo=${id}`, {
       headers: {
         Authorization: `Bearer ${getAccessToken()}`,
       },
@@ -38,6 +39,7 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
         console.error("Error fetching producto:", err);
         setLoading(false);
       });
+    console.log(producto)
   }, [id]);
 
   const handleRemove = () => {

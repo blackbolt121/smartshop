@@ -14,12 +14,10 @@ const ProductsSection = ( {productData, title}: ProductSectionProps) => {
     const renderContent = () => {
 
         if (productData.length == 0) {
-            return <div>
-                {[0,1,2,3,4,5].map( x => {
+            return [0,1,2,3,4].map( x => {
                     console.log(x);
                     return (<SkeletonCard/>)
-                })}
-            </div>;
+                });
         }
 
         // Aquí se renderiza TU ProductCard con las props correctas.
@@ -31,6 +29,7 @@ const ProductsSection = ( {productData, title}: ProductSectionProps) => {
                 price={product.price}
                 description={product.description}
                 imageUrl={product.imageUrl}
+                sku={product.sku}
             />
         ));
     };
@@ -38,7 +37,8 @@ const ProductsSection = ( {productData, title}: ProductSectionProps) => {
     return (
         <div className="">
             <div className='container mx-auto px-4'>
-                <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">{title}</h2>
+                <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl tracking-tight text-center mb-2">{title}</h1>
+                <div className="w-50 h-1 bg-red-600 mx-auto mb-15"></div>
                 {/* La grilla responsiva se ajusta para mostrar las tarjetas.
                     El `justify-items-center` ayuda a centrar las tarjetas si el espacio de la grilla es mayor.
                 */}

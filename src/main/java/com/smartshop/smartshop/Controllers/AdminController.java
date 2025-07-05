@@ -248,7 +248,7 @@ public class AdminController {
         // Parsear JSON con los productos seleccionados
 
         obj.keys().forEachRemaining(key -> {
-            Producto producto = productRepository.findById(key).orElse(null);
+            Producto producto = productRepository.findById(UUID.fromString(key)).orElse(null);
             if (producto != null) {
                 Integer quantity = obj.getJSONObject(key).getInt("cantidad");
                 QuoteItem quoteItem = QuoteItem.builder()

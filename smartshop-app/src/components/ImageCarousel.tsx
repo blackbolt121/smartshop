@@ -10,7 +10,7 @@ import { getAccessToken } from "../store/auth";
 import { useNavigate } from "react-router-dom";
 // import proforza from "../assets/proforza.jpg"
 // import balta from "../assets/balta.jpg"
-
+const apiUrl = import.meta.env.VITE_API_URL;
 
 
 
@@ -33,7 +33,7 @@ const ImageCarousel = () => {
 
     const fetchVendors = async () => {
 
-        const request = await axios.get<Vendor[]>(`http://localhost:8080/rest/api/1/vendor/all`, {
+        const request = await axios.get<Vendor[]>(`${apiUrl}/rest/api/1/vendor/all`, {
             headers: {
                 "Authorization": `Bearer ${getAccessToken()}`
             }

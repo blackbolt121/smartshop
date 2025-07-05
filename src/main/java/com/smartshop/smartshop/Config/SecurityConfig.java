@@ -89,6 +89,7 @@ public class SecurityConfig {
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().permitAll()
 
+
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)

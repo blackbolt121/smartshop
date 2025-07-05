@@ -7,7 +7,7 @@ import { getAccessToken, validateToken, removeTokens } from "../store/auth";
 import { useNavigate } from "react-router-dom";
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import CartItemCard from "./CartItemCard";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 
 
 
@@ -58,7 +58,7 @@ const Cart = () => {
       }
       else {
         console.log('Validando orden de pedido')
-        const createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+        const createCart = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`,
           {
             method: "GET",
             headers: {
@@ -86,7 +86,7 @@ const Cart = () => {
       console.log(`The flag is ${flag}`)
       if (flag) {
         console.log(`Creating cart ${flag}`)
-        const response = await fetch("http://localhost:8080/rest/api/1/cart/order", {
+        const response = await fetch(`${apiUrl}/rest/api/1/cart/order`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const Cart = () => {
         localStorage.setItem("cartId", String(cartId))
       } else {
         console.log("Actualizando carrito")
-        const response = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`, {
+        const response = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -121,7 +121,7 @@ const Cart = () => {
         console.log(response)
       }
       console.log(cartId)
-      //window.location.href = `http://localhost:8080/checkout?cart=${cartId}`
+      window.location.href = `https://localhost:8080/checkout?cart=${cartId}`
 
     } catch (error) {
       console.error("Error al enviar el carrito:", error);
@@ -144,7 +144,7 @@ const Cart = () => {
     let flag = false
 
     if (cartId != null) {
-      const createCart = await fetch(`http://localhost:8080/rest/api/1/cart/order/${cartId}`,
+      const createCart = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`,
         {
           method: "GET",
           headers: {
@@ -188,7 +188,7 @@ const Cart = () => {
         <div className="flex flex-col gap-2">
           <div className="space-y-4">
             {cartItems.map((item: CartItem) => (
-              <CartItemCard id={item.id} quantity={item.quantity} key={item.id} />
+              <CartItemCard id={item.sku} quantity={item.quantity} key={item.id} />
             ))}
           </div>
 

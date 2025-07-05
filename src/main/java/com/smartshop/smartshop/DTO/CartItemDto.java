@@ -1,7 +1,9 @@
 package com.smartshop.smartshop.DTO;
 
+import java.util.UUID;
+
 public record CartItemDto(
-        String id,
+        UUID id,
         String name,
         Integer quantity
 ) {}

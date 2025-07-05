@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UrreaProductRepository extends JpaRepository<UrreaProduct, String> {
@@ -19,5 +20,13 @@ public interface UrreaProductRepository extends JpaRepository<UrreaProduct, Stri
 
     @Query("SELECT DISTINCT u.marca FROM UrreaProduct u")
     List<String> getMarcas();
+
+    //@Query("SELECT p FROM UrreaProduct as p WHERE p.id=:id OR p.codigo LIKE ':codigo' ESCAPE '/'")
+
+    Optional<UrreaProduct> findByIdOrCodigo(String id, String codigo);
+
+    Optional<UrreaProduct> findByCodigoOrCodigoBarras(String codigo, String codigoBarras);
+
+    Optional<UrreaProduct> findByCodigo(String codigo);
 }
 

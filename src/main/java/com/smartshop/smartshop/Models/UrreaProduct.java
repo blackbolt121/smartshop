@@ -3,6 +3,8 @@ package com.smartshop.smartshop.Models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -11,8 +13,13 @@ import lombok.*;
 public class UrreaProduct {
 
     @Id
-    @Column(nullable = false, unique = true, length = 20)
+    private String id;
+
+    @Column(length = 20, nullable = false)
     private String codigo;
+
+    @Column(length = 20, nullable = false)
+    private String safe_sku;
 
     @Column(nullable = false, length = 500)
     private String nombreLargo;
@@ -103,4 +110,11 @@ public class UrreaProduct {
 
     @Column(columnDefinition = "TEXT")
     private String caracteristica;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 }

@@ -7,7 +7,7 @@ import { RootState } from '../../../store/store';
 import { updateVendor, setVendors } from "../../../store/store";
 import { Vendor } from '../../../store/store';
 import { useNavigate } from 'react-router-dom';
-
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export const VendorEdit = () => {
 
@@ -110,7 +110,7 @@ export const VendorEdit = () => {
         };
 
         try {
-            const response = await axios.put(`http://localhost:8080/rest/api/1/vendor/${selectedVendor.vendorId}`, updatedVendor, {
+            const response = await axios.put(`${apiUrl}/rest/api/1/vendor/${selectedVendor.vendorId}`, updatedVendor, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + getAccessToken()

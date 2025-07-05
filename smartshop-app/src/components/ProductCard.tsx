@@ -5,10 +5,11 @@ interface ProductCardProps {
   name?: string
   price?: number
   description?: string
-  imageUrl?: string
+  imageUrl?: string,
+  sku?: string
 }
 
-const ProductCard = ({ id, name, price, description, imageUrl } : ProductCardProps) => {
+const ProductCard = ({ id, name, sku, price, description, imageUrl } : ProductCardProps) => {
   // const navigate = useNavigate(); // Esto funcionaría en tu app con React Router configurado.
   const navigate = useNavigate()
 
@@ -41,7 +42,7 @@ const ProductCard = ({ id, name, price, description, imageUrl } : ProductCardPro
             {description || "Product Description"}
           </p>
           <p className="text-gray-600 text-sm mb-4">
-            <strong>SKU: </strong>{id || "Product SKU"}
+            <strong>SKU: </strong>{ sku || "Product SKU"}
           </p>
           <div className="mt-auto">
             <p className="font-bold text-xl text-black">

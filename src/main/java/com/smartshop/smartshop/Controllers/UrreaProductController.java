@@ -3,6 +3,7 @@ package com.smartshop.smartshop.Controllers;
 
 import com.smartshop.smartshop.Models.UrreaProduct;
 import com.smartshop.smartshop.Repositories.UrreaProductRepository;
+import com.smartshop.smartshop.Services.ProductoService;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,25 +29,58 @@ import java.util.Optional;
 public class UrreaProductController {
 
     private UrreaProductRepository urreaProductRepository;
-
+    private ProductoService productoService;
     @PostMapping
     public ResponseEntity<UrreaProduct> createProduct(@RequestBody UrreaProductRequest urreaProductRequest) {
-        UrreaProduct urreaProduct = urreaProductRequest.toEntity();
-        if(urreaProductRepository.existsById(urreaProduct.getCodigo())){
-            return ResponseEntity.badRequest().body(urreaProduct);
+
+        log.info("createProduct");
+        log.info(urreaProductRequest.codigo());
+        if(urreaProductRepository.findByCodigoOrCodigoBarras(urreaProductRequest.codigo(), urreaProductRequest.codigoBarras()).isPresent() && !urreaProductRequest.codigoBarras().isEmpty()){
+            Optional<UrreaProduct> urreaProduct = urreaProductRepository.findByCodigoOrCodigoBarras(urreaProductRequest.codigo(), urreaProductRequest.codigoBarras());
+            log.info("urreaProduct found!!!");
+            return ResponseEntity.ok().body(urreaProduct.orElse(null));
         }
+        UrreaProduct urreaProduct = urreaProductRequest.toEntity();
+        log.info(urreaProduct.getCodigo());
         urreaProductRepository.save(urreaProduct);
         return ResponseEntity.ok().body(urreaProductRequest.toEntity());
+    }
+
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<UrreaProductRequest>> bulkInsertProduct(@RequestBody UrreaProductRequest[] urreaProductRequests){
+
+        ArrayList<UrreaProductRequest> failedUrreaProductRequestList = new ArrayList<>();
+        for(UrreaProductRequest urreaProductRequest : urreaProductRequests){
+
+            try{
+
+                if(urreaProductRepository.findByCodigoOrCodigoBarras(urreaProductRequest.codigo(), urreaProductRequest.codigoBarras()).isPresent() && !urreaProductRequest.codigoBarras().isEmpty()){
+                    Optional<UrreaProduct> urreaProduct = urreaProductRepository.findByCodigoOrCodigoBarras(urreaProductRequest.codigo(), urreaProductRequest.codigoBarras());
+                    log.info("urreaProduct found!!!");
+                }else{
+                    UrreaProduct urreaProduct = urreaProductRequest.toEntity();
+                    log.info(urreaProduct.getCodigo());
+                    urreaProductRepository.save(urreaProduct);
+                }
+
+            }catch(Exception e){
+                failedUrreaProductRequestList.add(urreaProductRequest);
+            }
+        }
+        return  ResponseEntity.ok().body(failedUrreaProductRequestList);
     }
 
     @PutMapping
     public ResponseEntity<UrreaProduct> putProduct(@RequestBody UrreaProductRequest urreaProductRequest) {
         UrreaProduct urreaProduct = urreaProductRequest.toEntity();
-        if(!urreaProductRepository.existsById(urreaProduct.getCodigo())){
+        Optional<UrreaProduct> product = urreaProductRepository.findByIdOrCodigo(urreaProduct.getCodigo(),urreaProduct.getCodigo());
+        if(product.isEmpty()){
             return ResponseEntity.badRequest().body(urreaProduct);
         }
+        urreaProduct.setId(product.get().getId());
         urreaProductRepository.save(urreaProduct);
-        return ResponseEntity.ok().body(urreaProductRequest.toEntity());
+        return ResponseEntity.ok().body(urreaProduct);
     }
 
     @PatchMapping("/{codigo}")
@@ -52,7 +88,7 @@ public class UrreaProductController {
             @PathVariable String codigo,
             @RequestBody Map<String, Object> updates) {
 
-        Optional<UrreaProduct> optionalProduct = urreaProductRepository.findById(codigo);
+        Optional<UrreaProduct> optionalProduct = urreaProductRepository.findByIdOrCodigo(codigo, codigo);
 
         if (optionalProduct.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -105,7 +141,7 @@ public class UrreaProductController {
     @DeleteMapping("/{codigo}")
     public ResponseEntity<UrreaProduct> deleteProduct(@PathVariable String codigo) {
 
-        Optional<UrreaProduct> optionalProduct = urreaProductRepository.findById(codigo);
+        Optional<UrreaProduct> optionalProduct = urreaProductRepository.findByIdOrCodigo(codigo, codigo);
 
         if (optionalProduct.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -118,14 +154,28 @@ public class UrreaProductController {
         return ResponseEntity.ok(product);
     }
 
+    @PutMapping("/asProduct")
+    public ResponseEntity<UrreaProduct> saveAsProduct(@RequestParam String codigo) {
+        Optional<UrreaProduct> optionalProduct = urreaProductRepository.findByIdOrCodigo(codigo, codigo);
+        if (optionalProduct.isEmpty()) {
+            return ResponseEntity.ok().build();
+        }
+        UrreaProduct product = optionalProduct.get();
+        if(!product.getEstatusInventario().equals("No disponible")) {
+            productoService.saveUrreaProductToProduct(product);
+        }
+        return  ResponseEntity.ok(product);
+    }
+
     @GetMapping("/all")
     public Page<UrreaProduct> getAllProducts(@Validated @NonNull Pageable pageable) {
         return urreaProductRepository.findAll(pageable);
     }
 
-    @GetMapping("/{codigo}")
-    public ResponseEntity<UrreaProduct> getProduct(@PathVariable String codigo) {
-        Optional<UrreaProduct> product = urreaProductRepository.findById(codigo);
+    @GetMapping("")
+    public ResponseEntity<UrreaProduct> getProduct(@RequestParam String codigo) {
+        log.info(codigo);
+        Optional<UrreaProduct> product = urreaProductRepository.findByIdOrCodigo(codigo, codigo);
         return product.map(urreaProduct -> ResponseEntity.ok().body(urreaProduct)).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

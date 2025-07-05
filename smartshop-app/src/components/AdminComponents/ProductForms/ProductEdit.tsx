@@ -4,6 +4,8 @@ import axios from "axios";
 import { getAccessToken } from "../../../store/auth";
 import { Vendor } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
+const apiUrl = import.meta.env.VITE_API_URL;
+
 export const ProductEdit = () => {
 
 
@@ -40,7 +42,7 @@ export const ProductEdit = () => {
 
     // Cargar lista de productos disponibles
     useEffect(() => {
-        axios.get("http://localhost:8080/rest/api/1/producto/all", {
+        axios.get(`${apiUrl}/rest/api/1/producto/all`, {
             headers: {
                 'Content-Type': 'application/json',
                 "Authorization": "Bearer " + getAccessToken()
@@ -56,7 +58,7 @@ export const ProductEdit = () => {
     }, []);
     // Obtener la lista de vendors al cargar el componente
     useEffect(() => {
-        axios.get("http://localhost:8080/rest/api/1/vendor/all",
+        axios.get(`${apiUrl}/rest/api/1/vendor/all`,
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -74,7 +76,7 @@ export const ProductEdit = () => {
     // Cargar datos del producto seleccionado
     useEffect(() => {
         if (selectedProductId) {
-            axios.get(`http://localhost:8080/rest/api/1/producto/${selectedProductId}`, {
+            axios.get(`${apiUrl}/rest/api/1/producto/${selectedProductId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     "Authorization": "Bearer " + getAccessToken()
@@ -96,7 +98,7 @@ export const ProductEdit = () => {
 
     const handleSubmit = async () => {
         try {
-            await axios.put(`http://localhost:8080/rest/api/1/producto/${product.id}`, product, {
+            await axios.put(`${apiUrl}/rest/api/1/producto/${product.id}`, product, {
                 headers: {
                     'Content-Type': 'application/json',
                     "Authorization": "Bearer " + getAccessToken()

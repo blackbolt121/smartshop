@@ -9,12 +9,10 @@ import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.RequestModels.CartItemRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,6 +23,8 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
     private final ProductRepository productoRepository;
+    private final ProductoService productoService;
+    private final ConversionService conversionService;
 
 
     public Cart updateCart(CartItemRequest[] cartItemRequest, Cart cart) {
@@ -39,7 +39,7 @@ public class CartService {
             try {
                 log.info("Updating cart item {}", cartItemRequest1);
 
-                Producto product = productoRepository.findById(cartItemRequest1.productId())
+                Producto product = productoService.getProduct(cartItemRequest1.productId())
                         .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
                 CartItemId cartItemId = new CartItemId(cart.getId(), product.getId());
@@ -64,27 +64,42 @@ public class CartService {
         Cart cart = new Cart();
         cart.setUsuario(usuario);
         cartRepository.save(cart);
-        Set<CartItem> cartItems = new HashSet<>();
+        log.info("Creating cart for cart id {}", cart.getId());
+        log.info("Cart by user {}", usuario.getId());
 
+        Set<CartItem> items = new HashSet<>();
         for(CartItemRequest cartItemRequest1 : cartItemRequest) {
             try{
                 CartItemId cartItemId = new CartItemId();
                 cartItemId.setCartId(cart.getId());
-                cartItemId.setProductId(cartItemRequest1.productId());
-                Producto product = productoRepository.findById(cartItemRequest1.productId()).orElse(null);
+
+                Producto product = productoService.getProduct(cartItemRequest1.productId()).orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                log.info("Product found {}", product.getId().toString());
+                cartItemId.setProductId(product.getId());
                 Integer quantity = cartItemRequest1.quantity();
                 CartItem cartItem = new CartItem(cartItemId, cart, product, quantity);
                 cartItemRepository.save(cartItem);
-                cartItems.add(cartItem);
-            }catch (Exception ignored){
+                items.add(cartItem);
 
+            }catch (Exception ignored){
+                log.info("Error al agregar item al carrito", ignored);
             }
         }
-        cartItemRepository.saveAll(cartItems);
-        cart.setItems(cartItems);
+        log.info("Saving cart items!!!");
+        log.info("Cart length: {}", items.size());
+        cart.setItems(items);
+        try{
+            log.info("Saving cart items {}", cart.getId());
+            //cartItemRepository.saveAll(cartItems);
+        }catch (Exception ignored){
+            log.info("Error al agregar item al carrito", ignored);
+            return cart;
+        }
 
-        cartRepository.save(cart);
 
+
+        log.info("All cart items saved!!!");
+        log.info("Saving Cart!!!");
 
         return cart;
     }

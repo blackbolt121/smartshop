@@ -4,6 +4,7 @@ import {Link, useNavigate} from "react-router-dom"
 import axios from "axios";
 import { TokenPayload } from "../types/TokenPayload";
 import {saveTokens, getAccessToken} from "../store/auth"
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Signup = () => {
 
@@ -48,7 +49,7 @@ const Signup = () => {
         setError(null); // Limpiar el error
         alert("Signup")
 
-        let request  = await axios.post("http://localhost:8080/auth/register", {
+        let request  = await axios.post(`${apiUrl}/auth/register`, {
             email,
             password,
             name,

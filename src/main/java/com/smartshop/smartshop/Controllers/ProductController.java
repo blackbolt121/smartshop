@@ -1,9 +1,11 @@
 package com.smartshop.smartshop.Controllers;
 
 
+import com.smartshop.smartshop.Cache.ProductCacheService;
 import com.smartshop.smartshop.Models.Producto;
 import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.Services.ProductoService;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 
+@Slf4j
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "/rest/api/1/producto")
 @RestController
@@ -23,6 +26,10 @@ public class ProductController {
     private ProductoService service;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ProductCacheService productCacheService;
+    @Autowired
+    private ProductoService productoService;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> createProduct(@RequestBody Producto producto){
@@ -110,9 +117,25 @@ public class ProductController {
         return ResponseEntity.status(204).build();
     }
 
+
+    
+
     @GetMapping("/categorias")
     public ResponseEntity<List<String>> obtenerCategorias() {
-        List<String> categories = productRepository.findDistinctCategories();
-        return ResponseEntity.ok(categories);
+
+
+        List<String> topProducts = productRepository.findDistinctCategories();
+
+//        List<String> topProducts = productCacheService.getAllCategories();
+//        if (topProducts == null) {
+//            log.info("topProducts is null");
+//            List<String> categories = productRepository.findDistinctCategories();
+//            productCacheService.setAllCategories(categories);
+//            topProducts = categories;
+//        }else{
+//            log.info("topProducts is not null");
+//        }
+
+        return ResponseEntity.ok(topProducts);
     }
 }

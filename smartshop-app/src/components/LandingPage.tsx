@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import PromotionsCarousel from './PromotionCarousel/PromotionCarousel';
 import ProductSection from "./ProductSection.tsx";
 import CategoriesSection from "../CategoriesSection.tsx";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const LandingPage = () => {
 
@@ -20,7 +21,7 @@ const LandingPage = () => {
     async function loadCategories() {
         try {
             const response = await axios.get<string[]>(
-                `http://localhost:8080/rest/api/1/producto/categorias`,
+                `${apiUrl}/rest/api/1/producto/categorias`,
                 {
                     headers: {
                         Authorization: `Bearer ${getAccessToken()}`,
@@ -49,7 +50,7 @@ const LandingPage = () => {
                 "Accept": "application/json",
                 "Authorization": `Bearer ${getAccessToken()}`
             })
-            const productRequest = await axios.get<Product[]>("http://localhost:8080/rest/api/1/producto/top", {
+            const productRequest = await axios.get<Product[]>(`${apiUrl}/rest/api/1/producto/top`, {
                 headers: {
                     "Authorization": `Bearer ${getAccessToken()}`
                 }
@@ -94,7 +95,7 @@ const LandingPage = () => {
             </div>
             <br />
             <div className='bg-white shadow-lg flex flex-col py-10 px-4'>
-                <ProductSection productData={products} title={"Top Productos"} />
+                <ProductSection productData={products} title={"Nuestros productos"} />
             </div>
             
             <div className="py-10 px-5 my-10 bg-white">

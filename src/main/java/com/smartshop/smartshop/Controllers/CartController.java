@@ -4,6 +4,7 @@ import com.smartshop.smartshop.DTO.CartResponseDto;
 import com.smartshop.smartshop.Models.Usuario;
 import com.smartshop.smartshop.Repositories.UserRepository;
 import com.smartshop.smartshop.Services.CartService;
+import com.smartshop.smartshop.Services.PedidosService;
 import com.smartshop.smartshop.Services.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class CartController {
     private final CartService cartService;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final PedidosService pedidosService;
 
 
     @PostMapping("/order")
@@ -61,21 +63,37 @@ public class CartController {
 
         cartService.save(cart);
 
+
+        try{
+            pedidosService.generatePedido(cart);
+        }catch(Exception e){
+            log.error(e.getMessage(),e);
+        }
+
+
         return ResponseEntity.ok().body("");
     }
 
     @GetMapping("/order/{id}")
     public ResponseEntity<CartResponseDto> getCart(@PathVariable String id) {
 
-        Cart cart = cartService.getCartById(id);
+        log.info(String.valueOf(id));
+        try{
+            Cart cart = cartService.getCartById(id);
 
-        log.info("getCart: {}", cart);
+            log.info("getCart: {}", cart);
 
-        if (cart == null) {
+            if (cart == null) {
+                log.info("getCart: no cart found");
+                return ResponseEntity.notFound().build();
+            }else{
+                log.info("getCart: {}", cart);
+            }
+            return ResponseEntity.ok().body(cartService.toDto(cart));
+        }catch (Exception ignored){
+            log.error("getCart: exception", ignored);
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok().body(cartService.toDto(cart));
     }
 
     @PutMapping("/order/{id}")

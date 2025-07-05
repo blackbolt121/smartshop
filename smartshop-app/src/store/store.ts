@@ -1,15 +1,18 @@
 // src/store.ts
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import cartReducer from './cartSlice';
+import userReducer from './UserSlice.ts';
 
 
 export type Product = {
   id: string,
   name: string,
+  sku: string,
   price: number,
   description: string,
   imageUrl: string,
-  vendor: Vendor
+  vendor: Vendor,
+  category: string,
 }
 export type Vendor  = {
   "vendorId": string,
@@ -88,7 +91,8 @@ const store = configureStore({
   reducer: {
     counter: counterSlice.reducer,
     vendors: vendorSlice.reducer,
-    cart: cartReducer
+    cart: cartReducer,
+    user: userReducer
   },
 });
 

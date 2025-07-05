@@ -44,6 +44,8 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'org.json:json:20240303'
 	compileOnly group: 'com.konghq', name: 'unirest-java-core', version: '4.4.5'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.apache.commons:commons-pool2' // para conexión pool
 }
 
 tasks.named('test') {

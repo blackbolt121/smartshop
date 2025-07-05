@@ -138,62 +138,69 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
-        final String userEmail = jwtService.extractUsername(jwt);
-        logger.info("JWT token: " + jwt);
-        logger.info("User: " + userEmail);
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (userEmail == null || authentication != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        final UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-        final boolean isTokenExpiredOrRevoked = tokenRepository.findByToken(jwt)
-                .map(token -> (token.isExpired() || token.isRevoked()))
-                .orElse(false);
-        Token token = tokenRepository.findByToken(jwt).orElse(null);
-        logger.info("isTokenExpiredOrRevoked: " + isTokenExpiredOrRevoked);
-        logger.info("Token: " + jwt);
-        logger.info("Is revoked " + token.isRevoked());
-        logger.info("Is expired " + token.isExpired());
-
-        if(isTokenExpiredOrRevoked && path.startsWith("/admin")) {
-            resetCookie(response, request);
-            filterChain.doFilter(request, response);
-            return;
-        } else if (!isTokenExpiredOrRevoked && path.startsWith("/admin/")) {
-            String username = userDetails.getUsername();
-            Usuario usuario = userService.getUserByEmail(username);
-            logger.info("User: " + usuario.getRoles().toString());
-            logger.info(usuario.getRoles().stream().filter(role -> role.getName().equals("ROLE_ADMIN")).count());
-            if(usuario.getRoles().stream().noneMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
-                resetCookie(response, request);
+        try{
+            final String userEmail = jwtService.extractUsername(jwt);
+            logger.info("JWT token: " + jwt);
+            logger.info("User: " + userEmail);
+            final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (userEmail == null || authentication != null) {
                 filterChain.doFilter(request, response);
                 return;
             }
-        }
 
-        if (!isTokenExpiredOrRevoked) {
-            final Optional<Usuario> user = userRepository.findByEmail(userEmail);
-            logger.info("User: " + user.get().getId());
-            final boolean isTokenValid = jwtService.isTokenValid(jwt, user.get());
-            logger.info("isTokenValid: " + isTokenValid);
-            if (isTokenValid) {
-                logger.info("Passed authentication");
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            final UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            final boolean isTokenExpiredOrRevoked = tokenRepository.findByToken(jwt)
+                    .map(token -> (token.isExpired() || token.isRevoked()))
+                    .orElse(false);
+            Token token = tokenRepository.findByToken(jwt).orElse(null);
+            logger.info("isTokenExpiredOrRevoked: " + isTokenExpiredOrRevoked);
+            logger.info("Token: " + jwt);
+            logger.info("Is revoked " + token.isRevoked());
+            logger.info("Is expired " + token.isExpired());
 
-                logger.info("Successfully authenticated user");
+            if(isTokenExpiredOrRevoked && path.startsWith("/admin")) {
+                resetCookie(response, request);
+                filterChain.doFilter(request, response);
+                return;
+            } else if (!isTokenExpiredOrRevoked && path.startsWith("/admin/")) {
+                String username = userDetails.getUsername();
+                Usuario usuario = userService.getUserByEmail(username);
+                logger.info("User: " + usuario.getRoles().toString());
+                logger.info(usuario.getRoles().stream().filter(role -> role.getName().equals("ROLE_ADMIN")).count());
+                if(usuario.getRoles().stream().noneMatch(role -> role.getName().equals("ROLE_ADMIN"))) {
+                    resetCookie(response, request);
+                    filterChain.doFilter(request, response);
+                    return;
+                }
             }
+
+            if (!isTokenExpiredOrRevoked) {
+                final Optional<Usuario> user = userRepository.findByEmail(userEmail);
+                logger.info("User: " + user.get().getId());
+                final boolean isTokenValid = jwtService.isTokenValid(jwt, user.get());
+                logger.info("isTokenValid: " + isTokenValid);
+                if (isTokenValid) {
+                    logger.info("Passed authentication");
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    logger.info("Successfully authenticated user");
+                }
+            }
+            filterChain.doFilter(request, response);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            response.setStatus(403);
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
+
     }
 }

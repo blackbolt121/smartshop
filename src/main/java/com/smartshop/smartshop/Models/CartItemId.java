@@ -4,6 +4,7 @@ import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Embeddable
 @Getter
@@ -15,5 +16,5 @@ public class CartItemId implements Serializable {
 
     private Long cartId;
 
-    private String productId;
+    private UUID productId;
 }
