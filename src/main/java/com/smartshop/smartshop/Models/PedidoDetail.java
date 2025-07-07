@@ -1,29 +1,35 @@
 package com.smartshop.smartshop.Models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-
+@Entity
+@Table(name = "pedido_detail")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@ToString(exclude = {"pedidos", "producto"}) // Excluye las referencias a los padres
-//@EqualsAndHashCode(exclude = {"pedidos", "producto"}) // Excluye las referencias a los padres
+@ToString(exclude = {"pedidos", "producto"})
+@EqualsAndHashCode(of = {"id"})
 public class PedidoDetail {
 
-    @Id
+    @EmbeddedId
     private ProductDetailId id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("pedidoId") // Mapea al campo 'pedidoId' de ProductDetailId
-    @JoinColumn(name = "pedidoId")
-    private Pedidos pedidos;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("productId") // Mapea al campo 'productId' de ProductDetailId
-    @JoinColumn(name = "productoId")
+    @MapsId("pedidoId")
+    @JoinColumn(name = "pedido_id", nullable = false)  // ✅ usa snake_case y quita insertable/updatable
+    @JsonIgnore
+    private Pedidos pedidos;
+
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("productId")
+    @JoinColumn(name = "producto_id", nullable = false)  // ✅ usa snake_case
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Producto producto;
 
     @Column(nullable = false)

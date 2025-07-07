@@ -177,7 +177,9 @@ const Cart = () => {
   }, [])
 
   return (
-    <div className="container mx-auto p-4 mt-16">
+    <div className="container mx-auto p-4 mb-4">
+      <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Tu Carrito</h1>
+      <div className="w-10 h-1 bg-red-600 mb-4"></div>
       {cartItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-96 text-gray-500">
           <ShoppingCartOutlinedIcon style={{ fontSize: 80 }} className="text-red-600" />
@@ -185,67 +187,94 @@ const Cart = () => {
           <p className="text-lg">Agrega productos para verlos aquí.</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-2">
-          <div className="space-y-4">
-            {cartItems.map((item: CartItem) => (
-              <CartItemCard id={item.sku} quantity={item.quantity} key={item.id} />
-            ))}
-          </div>
 
-          <div className="my-4">
-            <div className="text-right">
-              <span className="text-xl text-gray-800">Subtotal:
-                <span className="font-semibold text-gray-800"> {(totalPrice).toLocaleString("es-MX", {
-                  style: "currency",
-                  currency: "MXN",
-                })} MXN</span>
-              </span>
-            </div>
-            <div className="text-right">
-              <span className="text-xl text-gray-800">IVA:
-                <span className="font-bold text-gray-800"> {(totalPrice * 0.16).toLocaleString("es-MX", {
-                  style: "currency",
-                  currency: "MXN",
-                })} MXN</span>
-              </span>
+        <div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-md divide-slate-200 divide-y">
+              {cartItems.map((item: CartItem) => (
+                <CartItemCard id={item.id} quantity={item.quantity} sku={item.sku} key={item.id} />
+              ))}
             </div>
 
-            <div className="text-right">
-              <span className="text-xl text-gray-800">Envio:
-                <span className="font-bold text-gray-800"> {(500).toLocaleString("es-MX", {
-                  style: "currency",
-                  currency: "MXN",
-                })} MXN</span>
-              </span>
+            <div className="my-4">
+              <div className="lg:col-span-1">
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">Resumen del Pedido</h2>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Subtotal:</span>
+                      <span className="font-medium">{(totalPrice).toLocaleString("es-MX",{ style: "currency",
+                        currency: "MXN"})} MXN</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>IVA (16%):</span>
+                      <span className="font-medium">{(totalPrice * 0.16).toLocaleString("es-MX",{ style: "currency",
+                        currency: "MXN"})} MXN</span>
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Envío:</span>
+                      <span className="font-medium">${(500).toFixed(2)} MXN</span>
+                    </div>
+                    <div className={"border-b border-slate-200"}></div>
+                    <div className="flex justify-between text-xl font-bold text-gray-900">
+                      <span>Total a pagar:</span>
+                      <span>{(totalPrice * 1.16 + 500).toLocaleString("es-MX",{ style: "currency",
+                           currency: "MXN"})} MXN</span>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <form onSubmit={handleSubmit}>
+                      <button type={"submit"} className="w-full px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors">
+                        Continuar Compra
+                      </button>
+                    </form>
+                    <div className="mt-4 flex justify-between text-sm">
+                      <a onClick={()=> [
+                          navigate("/tienda")
+                      ]} className="text-blue-600 hover:underline">Seguir comprando</a>
+                      <button onClick={handleClearCart} className="text-gray-500 hover:text-red-600 hover:underline">Vaciar carrito</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+              {/*<div className="text-right">*/}
+              {/*  <span className="text-xl text-gray-800">Envio:*/}
+              {/*    <span className="font-bold text-gray-800"> {(500).toLocaleString("es-MX", {*/}
+              {/*      style: "currency",*/}
+              {/*      currency: "MXN",*/}
+              {/*    })} MXN</span>*/}
+              {/*  </span>*/}
+              {/*</div>*/}
 
 
-            <div className="text-right">
-              <span className="text-xl font-semibold text-gray-800">Total a pagar:
-                <span className="text-green-600"> {(totalPrice * 1.16 + 500).toLocaleString("es-MX", {
-                  style: "currency",
-                  currency: "MXN",
-                })} MXN</span>
-              </span>
-            </div>
+              {/*<div className="text-right">*/}
+              {/*  <span className="text-xl font-semibold text-gray-800">Total a pagar:*/}
+              {/*    <span className="text-green-600"> {(totalPrice * 1.16 + 500).toLocaleString("es-MX", {*/}
+              {/*      style: "currency",*/}
+              {/*      currency: "MXN",*/}
+              {/*    })} MXN</span>*/}
+              {/*  </span>*/}
+              {/*</div>*/}
 
-            <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
-              <button
-                onClick={handleClearCart}
-                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
-              >
-                Vaciar carrito
-              </button>
+              {/*<div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">*/}
+              {/*  <button*/}
+              {/*    onClick={handleClearCart}*/}
+              {/*    className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"*/}
+              {/*  >*/}
+              {/*    Vaciar carrito*/}
+              {/*  </button>*/}
 
-              <form onSubmit={handleSubmit}>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-                >
-                  Pagar
-                </button>
-              </form>
-            </div>
+              {/*  <form onSubmit={handleSubmit}>*/}
+              {/*    <button*/}
+              {/*      type="submit"*/}
+              {/*      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"*/}
+              {/*    >*/}
+              {/*      Pagar*/}
+              {/*    </button>*/}
+              {/*  </form>*/}
+              {/*</div>*/}
+
           </div>
         </div>
       )}

@@ -27,10 +27,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CartController {
 
+    private final PedidosService pedidosService;
+    private final UserService userService;
     private final CartService cartService;
     private final UserRepository userRepository;
-    private final UserService userService;
-    private final PedidosService pedidosService;
 
 
     @PostMapping("/order")

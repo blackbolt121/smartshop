@@ -51,7 +51,6 @@ public class Usuario {
 
     @Column(updatable = false)
     private LocalDateTime createdAt;
-
     @Column
     private LocalDateTime updatedAt;
 

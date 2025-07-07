@@ -1,224 +1,71 @@
-import {useState, useMemo} from "react";
+import {useState, useMemo, useEffect} from "react";
 import {Search, ChevronDown} from 'lucide-react'
-import {Pedido} from "./PedidosCard.tsx";
-import PedidoCard from "./PedidosCard.tsx";
+import {Pedido} from "../../store/store.ts"
+import PedidoCard, {PedidoCardDetail} from "./PedidosCard.tsx";
 import {Package} from "lucide-react"
+import {getAccessToken} from "../../store/auth.ts";
+const apiUrl = import.meta.env.VITE_API_URL
 
 
-const mockPedidos : Pedido[] = [
-    {
-        id: 'MX-789012',
-        fecha: '2024-06-15',
-        estado: 'Entregado',
-        total: 2450.50,
-        productos: [
-            {"producto": {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 1},
-            {"producto": {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 2},
-        ],
-    },
-    {
-        id: 'MX-654321',
-        fecha: '2024-06-28',
-        estado: 'En proceso',
-        total: 899.00,
-        productos: [
-            { producto: {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 1 },
-        ],
-    },
-    {
-        id: 'MX-345678',
-        fecha: '2024-05-20',
-        estado: 'Entregado',
-        total: 4200.00,
-        productos: [
-            {producto: {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 1},
-            {producto: {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 2},
-            {producto: {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 3},
-        ],
-    },
-    {
-        id: 'MX-987654',
-        fecha: '2024-04-10',
-        estado: 'Cancelado',
-        total: 150.00,
-        productos: [
-            {producto: {
-                    "id": "b4127c4d-00c2-4ff4-9f09-6fba550995db",
-                    "name": "Jgo 13 llaves comb mm",
-                    "sku": "1200DHM",
-                    "description": "Juego de 13 llaves combinadas métricas 6 puntas Urrea",
-                    "price": 1602,
-                    "imageUrl": "https://medios.urrea.com/catalogo/Urrea/hd/1200DHM.jpg",
-                    "vendor": {
-                        "vendorId": "dc1b23d5-0cf8-4c35-9b86-180365f37382",
-                        "vendorName": "Urrea",
-                        "vendorEmail": "",
-                        "vendorPhone": "",
-                        "vendorAddress": "",
-                        "vendorCity": "",
-                        "vendorState": '',
-                        "vendorZipCode": "",
-                        "vendorPostalCode": "",
-                        "vendorWebsite": "",
-                        "vendorWebsiteUrl": "",
-                        "vendorFaxUrl": ""
-                    },
-                    "category": "Llaves"
-                }, quantity: 1},
-        ],
-    },
-];
+const transformStatus = (status : string) => {
+
+    switch (status) {
+        case "EN_PROCESO":
+            return "En proceso"
+        case "ENTREGADO":
+            return "Entregado"
+        case "CANCELADO":
+            return "Cancelado"
+        case "ENVIADO":
+            return "Enviado"
+        default:
+            return "Cancelado"
+    }
+}
+
 
 function PedidosLanding() {
 
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('Todos');
+    const [pedidos, setPedidos] = useState<Pedido[]>([]);
+
+
+    useEffect(() => {
+        console.log(`${apiUrl}/rest/api/1/pedidos`)
+        fetch(`${apiUrl}/rest/api/1/pedidos`, {
+            headers: {
+                Authorization: `Bearer ${getAccessToken()}`,
+            }
+        })
+            .then(res => res.json())
+            .then(res => setPedidos(res.content)).catch(err => console.log(err));
+    }, [setPedidos])
+
+    useEffect(()=>{
+        console.log("Pedidos")
+        console.log(pedidos);
+    }, [pedidos]);
+
 
     // Lógica para filtrar los pedidos
     const pedidosFiltrados = useMemo(() => {
-        return mockPedidos.filter(pedido => {
-            const searchMatch = searchTerm === '' ||
-                pedido.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                pedido.productos.some(p => p.producto.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-            const statusMatch = statusFilter === 'Todos' || pedido.estado === statusFilter;
+        if(!pedidos) {
+            return [];
+        }
+
+        return pedidos.filter(pedido => {
+            const searchMatch = searchTerm === '' ||
+                `MX-${pedido.id}`.includes(searchTerm.toLowerCase()) ||
+                pedido.pedidoDetails.some(p => p.producto.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+            const statusMatch = statusFilter === 'Todos' || pedido.pedidoStatus === statusFilter;
 
             return searchMatch && statusMatch;
         });
-    }, [searchTerm, statusFilter]);
+    }, [searchTerm, statusFilter, pedidos]);
 
     return (
         // Este contenedor simula el área de contenido principal de tu página
@@ -262,8 +109,26 @@ function PedidosLanding() {
                 {/* Lista de pedidos */}
                 <div className="space-y-6">
                     {pedidosFiltrados.length > 0 ? (
-                        pedidosFiltrados.map(pedido => (
-                            <PedidoCard key={pedido.id} pedido={pedido} />
+                        pedidosFiltrados
+                            .map(pedido => {
+
+                                const transform : PedidoCardDetail = {
+                                    "id": `${pedido.id}`,
+                                    "fecha": pedido.createdAt? pedido.createdAt : "2024-12-31",
+                                    "estado": transformStatus(pedido.pedidoStatus),
+                                    "total": pedido.total,
+                                    "productos": pedido.pedidoDetails.map(item => {
+                                        return {
+                                            "producto": item.producto,
+                                            "quantity": item.quantity
+                                        }
+                                    }),
+                                }
+                                return transform
+                            })
+                            .map(pedido => (
+                                <PedidoCard key={pedido.id} pedido={pedido} />
+                                // <div>{JSON.stringify(pedido)}</div>
                         ))
                     ) : (
                         <div className="text-center py-16 px-4 bg-white rounded-lg shadow-sm border border-gray-200">

@@ -28,47 +28,57 @@ public class PedidosService {
 
     @Transactional
     public Pedidos generatePedido(Cart cart) {
-        // 1. Crea el objeto Pedido principal. Aún no lo guardes.
+        // Usamos System.out.println porque es directo y no depende de ninguna configuración de logs
+        System.out.println("\n--- [INICIO] Ejecutando generatePedido ---");
+
+        // 1. Crea el objeto Pedido principal.
         Pedidos nuevoPedido = new Pedidos();
         nuevoPedido.setUsuario(cart.getUsuario());
         nuevoPedido.setPedidoStatus(PedidoStatus.EN_PROCESO);
         nuevoPedido.setGuia("");
+        pedidoRepository.saveAndFlush(nuevoPedido);
+        //pedidoRepository.save(nuevoPedido);
 
-        // 2. Agrupa los productos del carrito para obtener sus cantidades.
+        // 2. Agrupa los productos.
         Map<UUID, Integer> productQuantityMap = new HashMap<>();
         for (CartItem item : cart.getItems()) {
             productQuantityMap.merge(item.getProduct().getId(), item.getQuantity(), Integer::sum);
         }
+        System.out.println("[PASO 2] Mapa de productos creado. Contiene " + productQuantityMap.size() + " productos únicos.");
 
-        // 3. Itera sobre los productos para crear y asociar los detalles.
+        // 3. Itera sobre los productos.
+        Set<PedidoDetail> pedidoDetails = new HashSet<>();
         for (Map.Entry<UUID, Integer> entry : productQuantityMap.entrySet()) {
-            UUID productoId = entry.getKey();
-            int cantidad = entry.getValue();
-
-            Producto producto = productoService.getProduct(productoId.toString())
-                    .orElseThrow(() -> new NoSuchElementException("Producto no encontrado con ID: " + productoId));
-
-            PedidoDetail detalle = new PedidoDetail();
-            detalle.setQuantity(cantidad);
-            detalle.setStatic_price(producto.getPrice()); // Guarda el precio del producto en ese momento
-
-            // Asocia el producto al detalle.
-            detalle.setProducto(producto);
-
-            // ¡CLAVE! Usa tu método de ayuda para asociar el detalle al pedido.
-            // Esto establece la relación en ambos lados y previene el error.
-            nuevoPedido.addDetail(detalle);
-
+            System.out.println(nuevoPedido.getId());
+            Producto producto = productoService.getProduct(entry.getKey().toString()).orElseThrow();
+            PedidoDetail detail = PedidoDetail.builder()
+                    .id(new ProductDetailId(nuevoPedido.getId(), producto.getId()))
+                    .producto(producto)
+                    .pedidos(nuevoPedido)
+                    .static_price(producto.getPrice())
+                    .quantity(entry.getValue())
+                    .build();
+            System.out.println(detail);
+            nuevoPedido.addDetail(detail);
         }
 
-        // 4. Una vez que el pedido está completo, calcula el total.
+        if (!nuevoPedido.getPedidoDetails().isEmpty()) {
+            PedidoDetail primerDetalle = nuevoPedido.getPedidoDetails().iterator().next();
+            System.out.println("El campo 'pedidos' del PRIMER objeto en la colección es null? " + (primerDetalle.getPedidos() == null));
+        }
+
+
+
+        // 4. Calcula el total.
         nuevoPedido.calcularTotal();
 
-
-
-        // 5. Guarda el objeto Pedido UNA SOLA VEZ.
-        // CascadeType.ALL se encargará de guardar todos los PedidoDetail asociados.
-        return pedidoRepository.save(nuevoPedido);
+        // 5. Guarda el pedido.
+        try {
+            //nuevoPedido.setPedidoDetails(pedidoDetails);
+            return pedidoRepository.save(nuevoPedido);
+        } catch (Exception e) {
+            System.err.println("\n[ERROR] EXCEPCIÓN ATRAPADA DURANTE EL SAVE!");
+            throw e;
+        }
     }
-
 }

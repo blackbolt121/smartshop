@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,4 +38,11 @@ public class Token {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")  // Ensure this matches the column name in your 'Usuario' table
     private Usuario usuario;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+
+
 }

@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
-import { Typography, Skeleton, Input, IconButton } from "@mui/joy";
+import React, { useEffect, useState } from "react";
+import { Skeleton } from "@mui/joy";
 import { useDispatch } from "react-redux";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { getAccessToken } from "../store/auth";
-import { FaTrashCan } from "react-icons/fa6";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 interface CartItemCardProps {
   id: string;
   quantity: number;
+  sku: string;
 }
 
 interface ProductoResponse {
@@ -17,15 +17,30 @@ interface ProductoResponse {
   precio: number;
   moneda: string;
   fotografia: string;
+  sku: string;
 }
 
-const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
+interface QuantitySelectorProps {
+  quantity: number;
+  onIncrease: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onDecrease: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+}
+
+const QuantitySelector = ({ quantity, onDecrease, onIncrease }: QuantitySelectorProps) => (
+    <div className="flex items-center border border-gray-300 rounded-md">
+      <button onClick={onDecrease} className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-l-md">-</button>
+      <span className="px-4 py-1 text-gray-800 font-medium">{quantity}</span>
+      <button onClick={onIncrease} className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-r-md">+</button>
+    </div>
+);
+
+const CartItemCard = ({ id, quantity, sku }: CartItemCardProps) => {
   const dispatch = useDispatch();
   const [producto, setProducto] = useState<ProductoResponse | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [productQuantity, setQuantity] = useState(quantity);
   useEffect(() => {
-    fetch(`${apiUrl}/rest/api/1/urrea/producto?codigo=${id}`, {
+    fetch(`${apiUrl}/rest/api/1/urrea/producto?codigo=${sku}`, {
       headers: {
         Authorization: `Bearer ${getAccessToken()}`,
       },
@@ -46,11 +61,11 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
     dispatch(removeFromCart(id));
   };
 
-  const handleQuantityChange = (qty: number) => {
-    if (!isNaN(qty) && qty >= 0) {
-      dispatch(updateQuantity({ id, quantity: qty }));
+  useEffect(() => {
+    if (!isNaN(productQuantity) && productQuantity >= 0) {
+      dispatch(updateQuantity({ id, quantity: productQuantity }));
     }
-  };
+  }, [productQuantity, dispatch, id]);
 
   if (loading) {
     return (
@@ -73,52 +88,73 @@ const CartItemCard = ({ id, quantity }: CartItemCardProps) => {
   }
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-center border border-gray-200 rounded-xl p-4 shadow-sm gap-4 bg-white hover:shadow-md transition">
+    <div className="flex items-center py-4">
       {/* Imagen */}
-      <div className="w-24 h-24 flex-shrink-0 rounded overflow-hidden border p-1 border-gray-200">
-        <img
-          src={producto.fotografia}
-          alt={`Imagen de ${producto.nombreLargo}`}
-          className="w-full h-full object-contain"
-        />
-      </div>
+          <img src={producto.fotografia} alt={producto.nombreLargo} className="w-20 h-20 object-cover rounded-md" />
+          <div className="flex-grow ml-4">
+            <h3 className="font-semibold text-gray-800">{producto.nombreLargo}</h3>
+            <p className="text-sm text-gray-500">Código: {producto.codigo}</p>
+            <p className="text-lg font-bold text-gray-900 mt-1">${producto.precio.toFixed(2)}</p>
+          </div>
+        <div className="flex flex-col items-end space-y-2">
+          <QuantitySelector
+              quantity={quantity}
+              onIncrease={() => {
+                setQuantity((prev) => prev + 1);
+              }}
+              onDecrease={() => {
+                setQuantity((prev) => (prev > 2)? prev - 1 : 1);
+              }}
+          />
+          <button onClick={handleRemove} className="text-sm text-red-600 hover:underline">
+            Eliminar
+          </button>
+        </div>
 
-      {/* Detalles */}
-      <div className="flex-1 w-full md:px-4">
-        <Typography level="h4" className="text-gray-800 font-semibold">
-          {producto.nombreLargo}
-        </Typography>
-        <Typography level="body-md" className="text-green-700 font-bold mt-1">
-          {producto.precio.toLocaleString("es-MX", {
-            style: "currency",
-            currency: "MXN",
-          })}
-        </Typography>
-        <Typography level="body-sm" className="text-gray-500">
-          Código: {producto.codigo}
-        </Typography>
-      </div>
+      {/*<div className="w-24 h-24 flex-shrink-0 rounded overflow-hidden border p-1 border-gray-200">*/}
+      {/*  <img*/}
+      {/*    src={producto.fotografia}*/}
+      {/*    alt={`Imagen de ${producto.nombreLargo}`}*/}
+      {/*    className="w-full h-full object-contain"*/}
+      {/*  />*/}
+      {/*</div>*/}
 
-      {/* Controles */}
-      <div className="flex items-center gap-3 mt-2 md:mt-0">
-        <Input
-          type="number"
-          size="sm"
-          variant="soft"
-          value={quantity}
-          sx={{ width: 80, color: "black", display: "flex", justifyContent: "center" }}
-          onChange={(e) => handleQuantityChange(parseInt(e.target.value))}
-        />
-        <IconButton
-          color="danger"
-          variant="soft"
-          onClick={handleRemove}
-          size="sm"
-          title="Eliminar del carrito"
-        >
-          <FaTrashCan />
-        </IconButton>
-      </div>
+      {/*/!* Detalles *!/*/}
+      {/*<div className="flex-1 w-full md:px-4">*/}
+      {/*  <Typography level="h4" className="text-gray-800 font-semibold">*/}
+      {/*    {producto.nombreLargo}*/}
+      {/*  </Typography>*/}
+      {/*  <Typography level="body-md" className="text-green-700 font-bold mt-1">*/}
+      {/*    {producto.precio.toLocaleString("es-MX", {*/}
+      {/*      style: "currency",*/}
+      {/*      currency: "MXN",*/}
+      {/*    })}*/}
+      {/*  </Typography>*/}
+      {/*  <Typography level="body-sm" className="text-gray-500">*/}
+      {/*    Código: {producto.codigo}*/}
+      {/*  </Typography>*/}
+      {/*</div>*/}
+
+      {/*/!* Controles *!/*/}
+      {/*<div className="flex items-center gap-3 mt-2 md:mt-0">*/}
+      {/*  <Input*/}
+      {/*    type="number"*/}
+      {/*    size="sm"*/}
+      {/*    variant="soft"*/}
+      {/*    value={quantity}*/}
+      {/*    sx={{ width: 80, color: "black", display: "flex", justifyContent: "center" }}*/}
+      {/*    onChange={(e) => handleQuantityChange(parseInt(e.target.value))}*/}
+      {/*  />*/}
+      {/*  <IconButton*/}
+      {/*    color="danger"*/}
+      {/*    variant="soft"*/}
+      {/*    onClick={handleRemove}*/}
+      {/*    size="sm"*/}
+      {/*    title="Eliminar del carrito"*/}
+      {/*  >*/}
+      {/*    <FaTrashCan />*/}
+      {/*  </IconButton>*/}
+      {/*</div>*/}
     </div>
   );
 };

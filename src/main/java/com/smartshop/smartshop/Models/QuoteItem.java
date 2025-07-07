@@ -1,4 +1,5 @@
 package com.smartshop.smartshop.Models;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,7 @@ public class QuoteItem {
     @ManyToOne(optional = false)
     private Producto product;
 
+    @JsonIgnore
     @ManyToOne(optional = false)
     private Cotizacion cotizacion;
 

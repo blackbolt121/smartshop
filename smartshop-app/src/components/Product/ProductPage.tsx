@@ -13,6 +13,7 @@ import Add from '@mui/icons-material/Add';
 
 import { addToCart } from "../../store/cartSlice";
 const apiUrl = import.meta.env.VITE_API_URL;
+
 export const ProductPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState<Product>();

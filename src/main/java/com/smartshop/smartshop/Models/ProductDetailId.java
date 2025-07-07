@@ -14,9 +14,11 @@ import java.util.UUID;
 @EqualsAndHashCode // Correcto aquí porque se basa en los valores de la clave
 public class ProductDetailId implements Serializable {
 
+    // Debe coincidir con el tipo del ID de Pedidos
+    private Long pedidoId;
     // Debe coincidir con el tipo del ID de Producto
     private UUID productId;
 
-    // Debe coincidir con el tipo del ID de Pedidos
-    private long pedidoId;
+
+
 }

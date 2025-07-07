@@ -48,4 +48,19 @@ public class ShopController {
     public String login() {
         return "forward:/index.html";
     }
+
+    @GetMapping("/pedidos")
+    public String pedidos() {
+        return "forward:/index.html";
+    }
+
+    @GetMapping("/pedido/{id}")
+    public String pedido() {
+        return "forward:/index.html";
+    }
+
+    @GetMapping("/cotizaciones")
+    public String cotizaciones() {
+        return "forward:/index.html";
+    }
 }

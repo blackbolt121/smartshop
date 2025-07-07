@@ -28,6 +28,27 @@ export type Vendor  = {
   "vendorWebsiteUrl": string,
   "vendorFaxUrl": string,
 }
+
+
+export interface Pedido {
+  id: number;
+  guia: string;
+  pedidoStatus: "EN_PROCESO" | "COMPLETADO" | "CANCELADO" | string;
+  pedidoDetails: PedidoDetail[];
+  total: number;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface PedidoDetail {
+  id: {
+    pedidoId: number;
+    productId: string;
+  };
+  producto: Product;
+  static_price: number;
+  quantity: number;
+}
 // Definir el tipo para el estado
 interface CounterState {
   count: number;
