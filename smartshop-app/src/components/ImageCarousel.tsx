@@ -1,77 +1,141 @@
-import React from "react";
-import austromex from "../assets/austromex.png";
-import ax from "../assets/ax.png";
-import camca from "../assets/camca.png";
-import craftop from "../assets/craftop.jpg";
-import fischer from "../assets/fischer.png";
-import high_power from "../assets/high_power.png";
-import ingusa from "../assets/ingusa.png";
-import ipesa from "../assets/ipesa.jpg";
-import itc from "../assets/itc.png";
-import licon from "../assets/licon.png";
-import montana from "../assets/montana.jpg";
-import munich from "../assets/munich.png";
-import oakland_tools from "../assets/oakland_tools.png";
-import santul from "../assets/santul.png";
 import urrea from "../assets/urrea.jpg";
-import urrea2 from "../assets/urrea2.png";
-import arj from "../assets/arj.jpg";
-import azteca from "../assets/azteca.png";
-import b2m from "../assets/b&m.png";
-import brotimex from "../assets/brotimex.jpg";
-import foy from "../assets/foy.png"
-import group_cn from "../assets/grup_cn.png";
-import kola_loca from "../assets/kola_loca.png"
-import litelux from "../assets/litelux.png"
-import palcove from "../assets/placove.png"
+// import foy from "../assets/foy.png"
 import surtex from "../assets/surtex.jpg"
-import acuario from "../assets/acuario.png"
-import amiber from "../assets/amiber.png"
-import metalfu from "../assets/metalfu.png"
+// import prolock from "../assets/prolock.jpg"
+import lock from "../assets/lock.jpg"
+import axios from "axios";
+import { Vendor } from "../store/store";
+import { useEffect, useState } from "react";
+import { getAccessToken } from "../store/auth";
+import { useNavigate } from "react-router-dom";
+// import proforza from "../assets/proforza.jpg"
+// import balta from "../assets/balta.jpg"
+const apiUrl = import.meta.env.VITE_API_URL;
 
 
-const images = [
-    austromex,
-    ax,
-    camca,
-    craftop,
-    fischer,
-    high_power,
-    ingusa,
-    ipesa,
-    itc,
-    licon,
-    montana,
-    munich,
-    oakland_tools,
-    santul,
-    urrea,
-    urrea2,
-    arj,
-    azteca,
-    b2m,
-    brotimex,
-    foy,
-    group_cn,
-    kola_loca,
-    litelux,
-    palcove,
-    surtex,
-    acuario,
-    amiber,
-    metalfu
 
-];
+
+
+interface VendorCarousel {
+    name: string,
+    id: string,
+    image: string
+}
+
 
 const ImageCarousel = () => {
+
+
+
+    const navigate = useNavigate()
+
+    const [vendor, setVendor] = useState<VendorCarousel[]>([])
+
+    const fetchVendors = async () => {
+
+        const request = await axios.get<Vendor[]>(`${apiUrl}/rest/api/1/vendor/all`, {
+            headers: {
+                "Authorization": `Bearer ${getAccessToken()}`
+            }
+        })
+
+
+        const vendors = request.data
+
+        console.log(vendors)
+
+        const arr: string[] = ["Urrea", "Surtek", "Lock"]
+
+        const vendorsArray = vendors.filter(vend => arr.includes(vend.vendorName)).map<VendorCarousel>(vend => {
+            switch (vend.vendorName) {
+                case "Urrea":
+                    return {
+                        "name": vend.vendorName,
+                        "id": vend.vendorId,
+                        "image": urrea
+                    }
+                case "Surtek":
+                    return {
+                        "name": vend.vendorName,
+                        "id": vend.vendorId,
+                        "image": surtex
+                    }
+                case "Lock":
+                    return {
+                        "name": vend.vendorName,
+                        "id": vend.vendorId,
+                        "image": lock
+                    }
+                default:
+                    return {
+                        "name": "Unkown",
+                        "id": "",
+                        "image": urrea
+                    }
+
+            }
+        })
+
+        setVendor(vendorsArray.sort((a, b)=> b.name.localeCompare(a.name)))
+        console.log(`Vendor ${vendorsArray.length}`)
+    }
+
+
+    useEffect(()=>{
+        fetchVendors().catch()
+    }, [])
+
+    useEffect(()=>{
+
+    }, [vendor])
+
     return (
-        <div className="overflow-hidden">
-            <div className="flex w-max animate-scroll gap-2 h-20">
-                {images.map((img, index) => (
-                    <img key={index} src={img} alt={`img-${index}`} className="w-40 h-auto rounded-md" />
+        <section className="py-12 rounded-lg mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 my-8">
+            {/* Contenedor para el texto introductorio y el título */}
+            <div className="text-center mb-10">
+                {/* Título de la sección, más grande y prominente */}
+                <h2 className="text-4xl font-extrabold text-gray-900 sm:text-5xl lg:text-6xl tracking-tight mb-3">
+                    Nuestros Proveedores de Confianza
+                </h2>
+                <div className="w-50 h-1 bg-red-600 mx-auto mb-10"></div>
+                {/* Descripción corta de la sección */}
+                <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+                    Trabajamos con marcas líderes en el mercado para asegurarte productos de la más alta calidad y durabilidad.
+                </p>
+            </div>
+
+            {/* Contenedor para los logotipos de los proveedores */}
+            {/* Usa 'grid' para un diseño responsivo que se adapta a diferentes tamaños de pantalla.
+          'grid-cols-1' para móvil, 'md:grid-cols-2' para tablet, 'lg:grid-cols-3' para escritorio.
+          'gap-8' para el espaciado entre los logos.
+          'justify-items-center' para centrar cada elemento dentro de su celda de la cuadrícula. */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+                {vendor.map((supplier) => (
+                    // Cada logo es un enlace para mejorar la interactividad
+                    <a
+                        key={supplier.id}
+                        onClick={()=>navigate(`/tienda?brand=${supplier.id}`)}// Abre el enlace en una nueva pestaña
+                        rel="noopener noreferrer" // Mejora la seguridad al abrir nuevas pestañas
+                        className="group block p-4 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                        aria-label={`Visita el sitio web de ${supplier.name}`}
+                    >
+                        {/* Imagen del logo del proveedor */}
+                        {/* 'object-contain' asegura que la imagen se escala dentro del contenedor sin ser cortada.
+                'max-h-24' y 'w-auto' limitan el tamaño de la imagen. */}
+                        <img
+                            src={supplier.image}
+                            alt={`Logo de ${supplier.name}`}
+                            className="mx-auto h-24 object-contain"
+                            // Manejo de errores para la imagen, en caso de que no cargue
+                        />
+                        {/* Nombre del proveedor, visible en hover si es necesario o siempre visible */}
+                        <p className="mt-4 text-center text-lg font-semibold text-gray-700 group-hover:text-blue-600 transition-colors duration-300">
+                            {supplier.name}
+                        </p>
+                    </a>
                 ))}
             </div>
-        </div>
+        </section>
     );
 };
 

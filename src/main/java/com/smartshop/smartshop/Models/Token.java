@@ -5,27 +5,44 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tokens")
+@Entity
+@Table(name = "tokens")
 public class Token {
+
     public enum TokenType {
         BEARER
     }
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)  // Ensure your DB supports UUID generation
     private String id;
-    @Column(unique = true)
+
+    @Column(unique = true)  // Token should be unique
     private String token;
+
     @Enumerated(EnumType.STRING)
-    public TokenType tokenType = TokenType.BEARER;
-    public boolean revoked;
-    public boolean expired;
+    @Builder.Default
+    private TokenType tokenType = TokenType.BEARER;
+
+    private boolean revoked;
+    private boolean expired;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    public Usuario usuario;
+    @JoinColumn(name = "user_id")  // Ensure this matches the column name in your 'Usuario' table
+    private Usuario usuario;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+    @Column
+    private LocalDateTime updatedAt;
+
+
 }

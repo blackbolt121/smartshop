@@ -21,6 +21,7 @@ build/
 public/build/
 package-lock.json
 yarn-error.log
+.gradle/
 
 # Archivos de Terraform
 .terraform/
@@ -58,3 +59,10 @@ Thumbs.db
 
 # Archivos de Docker
 .dockerignore
+node_modules/*
+*node_modules
+dist
+/build
+/static/assets/
+/build/classes
+/src/main/resources/static/*

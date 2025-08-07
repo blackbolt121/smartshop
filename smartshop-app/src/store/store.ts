@@ -1,13 +1,18 @@
 // src/store.ts
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import cartReducer from './cartSlice';
+import userReducer from './UserSlice.ts';
 
 
 export type Product = {
-  id: number,
+  id: string,
   name: string,
+  sku: string,
   price: number,
   description: string,
-  vendor: Vendor
+  imageUrl: string,
+  vendor: Vendor,
+  category: string,
 }
 export type Vendor  = {
   "vendorId": string,
@@ -22,6 +27,27 @@ export type Vendor  = {
   "vendorWebsite": string,
   "vendorWebsiteUrl": string,
   "vendorFaxUrl": string,
+}
+
+
+export interface Pedido {
+  id: number;
+  guia: string;
+  pedidoStatus: "EN_PROCESO" | "COMPLETADO" | "CANCELADO" | string;
+  pedidoDetails: PedidoDetail[];
+  total: number;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
+
+export interface PedidoDetail {
+  id: {
+    pedidoId: number;
+    productId: string;
+  };
+  producto: Product;
+  static_price: number;
+  quantity: number;
 }
 // Definir el tipo para el estado
 interface CounterState {
@@ -63,7 +89,7 @@ const vendorSlice = createSlice({
       state.push(action.payload);
     },
     removeVendor: (state, action: PayloadAction<string>) => {
-      return state.filter((vendor) => vendor.vendorId !== action.payload);
+      return state.filter((vendor: Vendor) => vendor.vendorId !== action.payload);
     },
     updateVendor: (state, action: PayloadAction<Vendor>) => {
       const index = state.findIndex((vendor) => vendor.vendorId === action.payload.vendorId);
@@ -71,8 +97,8 @@ const vendorSlice = createSlice({
         state[index] = action.payload;
       }
     },
-    setVendors: (state, action: PayloadAction<Vendor[]>) => {
-      state = action.payload;
+    setVendors: (_state, action: PayloadAction<Vendor[]>) => {
+      return action.payload;
     }
   },
 });
@@ -86,6 +112,8 @@ const store = configureStore({
   reducer: {
     counter: counterSlice.reducer,
     vendors: vendorSlice.reducer,
+    cart: cartReducer,
+    user: userReducer
   },
 });
 

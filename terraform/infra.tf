@@ -274,7 +274,7 @@ resource "aws_api_gateway_deployment" "smartshop_api_deployment" {
 resource "aws_amplify_app" "frontend" {
   name        = "smartshop-frontend"
   repository  = "https://github.com/blackbolt121/smarshop-frontend"
-  oauth_token = "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"
+  oauth_token = ""
 
   enable_auto_branch_creation = true
   enable_branch_auto_build    = true

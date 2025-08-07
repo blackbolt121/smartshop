@@ -1,23 +1,36 @@
 import { useEffect, useState } from "react";
-import { Button, Sheet, IconButton } from "@mui/joy";
-import { Menu, Close } from "@mui/icons-material";
+import { Button, Sheet, IconButton, Badge } from "@mui/joy";
+import { Menu, Close, ShoppingCart } from "@mui/icons-material";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/coaim-transparent.png" //"../assets/smarshop.png"
+import logo from "../assets/mercadourrea2.svg" //"../assets/smarshop.png"
 import { getAccessToken } from "../store/auth";
+import { useSelector } from "react-redux";
+import { RootState } from '../store/store';
+import UserProfile from "./UserProfile.tsx";
+import {useLocation} from "react-router-dom";
+//const apiUrl = import.meta.env.VITE_API_URL;
 
 
 
 
 const Navbar = () => {
   
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const [token, setToken] = useState<string>("")
   const [logText, setLogText] = useState<string>("Log In")
+
+  const location = useLocation()
 
   const toggleMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const hideMenu = () => {
+    setIsMobileMenuOpen(false);
+  }
 
   useEffect(()=>{
     setToken(getAccessToken() || "")
@@ -36,37 +49,50 @@ const Navbar = () => {
   }, [token])
 
   return (
-    <nav className="bg-blue-500 shadow-md">
+    <nav className="bg-white shadow-md">
       <div className="max-w-screen-xl mx-auto px-4 py-5 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center space-x-3">
-          <img src={logo} width={200} />
+          <Link to={"/"}><img alt={"MercadoUrrea.com.mx"} src={logo} width={200} /></Link>
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-8 text-white md:items-center md:justify-center">
-          <Link to="/" className="hover:text-indigo-200 transition-colors font-bold">Home</Link>
-          <Link to="/about" className="hover:text-indigo-200 transition-colors font-bold">About</Link>
-          <Link to="/contact" className="hover:text-indigo-200 transition-colors font-bold">Contact</Link>
-          <Link to="/tienda" className="hover:text-indigo-200 transition-colors font-bold">Tienda</Link>
-          <Button variant="outlined" sx={{ color: "white" }} className="text-white hover:bg-white hover:text-black" onClick={async () => {
+        <div className="hidden md:flex space-x-8 text-black md:items-center md:justify-center">
+          <Link to="/" className={`hover:text-red-500 transition-colors font-bold ${location.pathname == "/"? "border-b-2 border-b-red-600" : ""}`}>Inicio</Link>
+          <Link to="/about" className={`hover:text-red-500 transition-colors font-bold ${location.pathname == "/about"? "border-b-2 border-b-red-600" : ""}`}>Acerca</Link>
+          <Link to="/contact" className={`hover:text-red-500 transition-colors font-bold ${location.pathname == "/contact"? "border-b-2 border-b-red-600" : ""}`}>Contacto</Link>
+          <Link to="/tienda" className={`hover:text-red-500 transition-colors font-bold ${location.pathname == "/tienda"? "border-b-2 border-b-red-600" : ""}`}>Tienda</Link>
+          <Link to="/cart" className={`hover:text-red-500 transition-colors font-bold ${location.pathname == "/cart"? "border-b-2 border-b-red-600" : ""}`}><IconButton variant="plain" color="neutral">
+                <Badge badgeContent={cartItems.length} variant="solid" color="primary">
+                  <ShoppingCart />
+                </Badge>
+            </IconButton>
+          </Link>
+          {(getAccessToken())? <UserProfile/> : <Button variant="outlined" color="danger" sx={{ color: "black" }} className="text-white hover:bg-red-500 hover:text-black" onClick={async () => {
             if (getAccessToken()) {
               localStorage.removeItem("access_token")
               localStorage.removeItem("refresh_token")
-              //let request = await axios.post("http://localhost:8080/auth/logout")
-              console.log(getAccessToken())
+              //let request = await axios.post(`${apiUrl}/auth/logout`)
+              //console.log(getAccessToken())
               navigate("/logout")
             }else {
               navigate("/login")
             }
-            
+
           }}>
             {logText}
-          </Button>
+          </Button>}
         </div>
           
         {/* Mobile Menu Icon */}
-        <div className="md:hidden">
+        <div className="md:hidden flex gap-2 items-center">
+          {(getAccessToken())? <UserProfile/> : <></>}
+          <Link to="/cart" className={`hover:text-red-500 p-2 transition-colors font-bold ${location.pathname == "/cart"? "border-b-2 border-b-red-600" : ""}`}><IconButton variant="plain" color="neutral">
+            <Badge badgeContent={cartItems.length} variant="solid" color="primary">
+              <ShoppingCart />
+            </Badge>
+          </IconButton>
+          </Link>
           <IconButton onClick={toggleMenu} color="neutral">
             {isMobileMenuOpen ? <Close /> : <Menu />}
           </IconButton>
@@ -74,28 +100,31 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <Sheet className="bg-indigo-600 p-4 absolute top-0 left-0 right-0 z-10 md:hidden">
-          <div className="flex flex-col space-y-4 text-white">
-            <Link to={"/"} className="hover:text-indigo-200 transition-colors">Home</Link>
-            <Link to="/about" className="hover:text-indigo-200 transition-colors">About</Link>
-            <Link to="/contact" className="hover:text-indigo-200 transition-colors">Contact</Link>
-            <Link to="/tienda" className="hover:text-indigo-200 transition-colors">Tienda</Link>
-            <Button variant="outlined" sx={{ color: "white" }} className="text-white hover:bg-white hover:text-black" onClick={async () => {
+      {isMobileMenuOpen && (<div>
+        <Sheet className="p-4 absolute top-0 left-0 right-0 z-10 md:hidden">
+          <div className="flex flex-col text-black">
+            <Link to="/" onClick={hideMenu} className={`p-2 transition-colors font-bold ${location.pathname == "/"? "bg-red-500 text-white" : "hover:text-red-500"}`}>Inicio</Link>
+            <Link to="/about" onClick={hideMenu} className={`p-2 transition-colors font-bold ${location.pathname == "/about"? "bg-red-500 text-white" : "hover:text-red-500"}`}>Acerca</Link>
+            <Link to="/contact" onClick={hideMenu} className={`p-2 transition-colors font-bold ${location.pathname == "/contact"? "bg-red-500 text-white" : "hover:text-red-500"}`}>Contacto</Link>
+            <Link to="/tienda" onClick={hideMenu} className={`p-2 transition-colors font-bold ${location.pathname == "/tienda"? "bg-red-500 text-white" : "hover:text-red-500"}`}>Tienda</Link>
+            {(getAccessToken())? <></> : <Button variant="outlined" color="danger" sx={{ color: "black", mt: 1 }} className="text-white hover:bg-red-600 hover:text-black" onClick={async () => {
+              hideMenu()
               if (getAccessToken()) {
                 localStorage.removeItem("access_token")
                 localStorage.removeItem("refresh_token")
-                setToken("")
-                //let request = await axios.post("http://localhost:4000/auth/logout")
+                //let request = await axios.post(`${apiUrl}/auth/logout`)
+                //console.log(getAccessToken())
                 navigate("/logout")
               }else {
                 navigate("/login")
               }
+
             }}>
               {logText}
-            </Button>
+            </Button>}
           </div>
         </Sheet>
+      </div>
       )}
     </nav>
   );

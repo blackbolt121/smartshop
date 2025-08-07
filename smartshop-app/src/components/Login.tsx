@@ -5,7 +5,7 @@ import { getAccessToken, saveTokens } from "../store/auth";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { TokenPayload } from "../types/TokenPayload";
-
+const apiUrl = import.meta.env.VITE_API_URL;
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +30,7 @@ const Login = () => {
     }
     setError(null);
     try {
-      const auth = await axios.post("http://localhost:8080/auth/login", { 
+      const auth = await axios.post(`${apiUrl}/auth/login`, {
         email: email, 
         password: password 
       }, { 
@@ -43,7 +43,7 @@ const Login = () => {
         setError("Email or password is incorrect");
         return;
       }
-      let credentials: TokenPayload = auth.data;
+      const credentials: TokenPayload = auth.data;
       saveTokens(credentials.access_token, credentials.refresh_token);
       navigate("/"); // Redirect to home after login
     }catch (error) {

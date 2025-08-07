@@ -1,6 +1,6 @@
 //A component that display a text box using
 
-import { useState } from "react"
+//import { useState } from "react"
 import { Rating } from "@mui/material"
 import { Typography } from "@mui/joy"
 import { Comment } from "./Comment"
@@ -8,7 +8,7 @@ import { Comment } from "./Comment"
 
 export const Comments = () => {
 
-    const [raing, setRating] = useState<number>(0)
+    //const [rating, setRating] = useState<number>(0)
 
     const comments = [
         {
