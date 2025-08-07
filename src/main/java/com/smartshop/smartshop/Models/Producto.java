@@ -34,7 +34,8 @@ public class Producto  implements Serializable {
     @JoinColumn(name = "vendor_id")
     private Vendor vendor;
     @JsonIgnore
-    @OneToOne(fetch = FetchType.LAZY)
+    //@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL) // <--- Añade esto
+    @OneToOne(fetch = FetchType.LAZY) // <--- Añade esto
     @JoinColumn(name = "urrea_id")
     private UrreaProduct urreaProduct;
 

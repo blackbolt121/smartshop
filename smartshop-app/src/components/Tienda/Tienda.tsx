@@ -151,7 +151,7 @@ export const Tienda = () => {
                     <h1 className="text-3xl font-semibold text-gray-800 inline-flex items-center justify-center">
                         <MdSell className="text-amber-300"></MdSell>Todos los productos ({total})
                     </h1>
-                    <div className="flex space-x-4 w-50%">
+                    <div className="flex space-x-4 xs:w-full lg:w-50%">
                         <SearchComponent />
                     </div>
                 </div>

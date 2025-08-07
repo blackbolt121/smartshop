@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import PromotionsCarousel from './PromotionCarousel/PromotionCarousel';
 import ProductSection from "./ProductSection.tsx";
 import CategoriesSection from "../CategoriesSection.tsx";
+import PaymentMethodsSection from "./PaymentMethods.tsx";
 const apiUrl = import.meta.env.VITE_API_URL;
 
 const LandingPage = () => {
@@ -42,7 +43,7 @@ const LandingPage = () => {
     async function loadProducts() {
 
         
-        console.log(`Bearer ${getAccessToken()}`)
+        //console.log(`Bearer ${getAccessToken()}`)
 
         try{
             console.log({
@@ -97,7 +98,16 @@ const LandingPage = () => {
             <div className='bg-white shadow-lg flex flex-col py-10 px-4'>
                 <ProductSection productData={products} title={"Nuestros productos"} />
             </div>
-            
+            <div className='flex flex-col my-10 gap-10 bg-white h-auto py-10'>
+                <section>
+                    <ImageCarousel />
+                </section>
+            </div>
+
+            <div className="">
+                <PaymentMethodsSection/>
+            </div>
+
             <div className="py-10 px-5 my-10 bg-white">
                 {/*<Typography level='h1'>Categorias</Typography>*/}
                 {/*<div className='grid grid-cols-3 text-center gap-4 mt-4'>*/}
@@ -117,11 +127,7 @@ const LandingPage = () => {
                 <CategoriesSection title={"Explora Nuestras Categorías"} categories={categories} />
             </div>
 
-            <div className='flex flex-col my-10 gap-10 bg-white h-auto py-10'>
-                <section>
-                    <ImageCarousel />
-                </section>
-            </div>
+
 
             {/* Footer */}  
 

@@ -63,4 +63,14 @@ public class ShopController {
     public String cotizaciones() {
         return "forward:/index.html";
     }
+
+    @GetMapping("/cotizacion/{id}")
+    public String cotizacion() {
+        return "forward:/index.html";
+    }
+
+    @GetMapping("/terminos_y_condiciones")
+    public String terminos_y_condiciones() {
+        return "forward:/index.html";
+    }
 }

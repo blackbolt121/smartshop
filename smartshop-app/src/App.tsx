@@ -22,7 +22,9 @@ import PedidosPage from "./components/Pedidos/PedidosPage/PedidosPage.tsx";
 import PageNotFound from "./components/PageNotFound";
 import CotizacionLanding from "./components/Cotizaciones/CotizacionLanding.tsx";
 import QuotePage from "./components/Cotizaciones/QuotePage/QuotePage.tsx";
+import TerminosPage from "./components/Terminos/TerminosPage.tsx";
 const apiUrl = import.meta.env.VITE_API_URL;
+import Help from "./components/Help";
 
 function App() {
 
@@ -123,9 +125,11 @@ function App() {
             <Route path={"/pedido/:id"} element={<PedidosPage />} />
             <Route path={"/cotizaciones"} element={<CotizacionLanding />} />
             <Route path={"/cotizacion/:id"} element={<QuotePage />} />
+            <Route path={"/terminos_y_condiciones"} element={<TerminosPage/>} />
         </Routes>
       </div>
       <Footer />
+        <Help />
     </>
   )
 }

@@ -37,7 +37,7 @@ const UserProfile: FC = () => {
     }, [menuRef]);
 
     return (
-        <div className="relative" ref={menuRef}>
+        <div className={"relative"} ref={menuRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

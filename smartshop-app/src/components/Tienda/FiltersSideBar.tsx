@@ -71,7 +71,7 @@ const FiltersSidebar = ({ filters, setFilters  } : FiltersSideBarProps) => {
         loadVendors();
     }, []);
 
-    return <div className="w-1/3 p-2 sm:w-full lg:w-1/5 xl:w-1/4">
+    return <div className="w-full p-2 lg:w-1/3">
         <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><ListFilter size={20}/> Filtros
         </h2>
         <div className="space-y-6">

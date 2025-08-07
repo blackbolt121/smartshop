@@ -82,7 +82,16 @@
         <label class="block text-gray-500 text-xs uppercase mb-1">Código Postal</label>
         <input type="text" th:field="*{codigoPostal}" class="w-full border rounded px-3 py-2" />
       </div>
-
+      <div>
+        <label class="block text-gray-500 text-xs uppercase mb-1">Roles</label>
+        <div th:each="role : ${roles}">
+          <input type="checkbox"
+                 th:field="*{roles}"
+                 th:value="${role.id}"
+                 th:id="${'role_' + role.id}" />
+          <label th:for="${'role_' + role.id}" th:text="${role.name.replace('ROLE_', '').toLowerCase()}"></label>
+        </div>
+      </div>
     </div>
 
     <div class="mt-8 flex items-center justify-between">

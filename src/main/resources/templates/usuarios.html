@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Lista de Usuarios</title>
+    <link rel="icon" type="image/x-icon" href="https://res.cloudinary.com/dv0hzntey/image/upload/v1754238574/urrea_g4nc5s.ico">v
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex min-h-screen">
@@ -30,18 +31,35 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Roles</th>
                 <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
             </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-100" th:if="${usuarios != null}">
             <tr th:each="usuario : ${usuarios}">
-                <td class="px-4 py-2 text-sm text-gray-700" th:text="${usuario.id}">1</td>
+                <td class="px-4 py-2 text-sm text-gray-700" th:text="${usuario.id.substring(usuario.id.length()-7, usuario.id.length()-1)}">1</td>
                 <td class="px-4 py-2 text-sm text-gray-700" th:text="${usuario.name}">Juan Pérez</td>
                 <td class="px-4 py-2 text-sm text-gray-700" th:text="${usuario.email}">juan@example.com</td>
-                <td class="px-4 py-2 text-center">
-                    <a th:href="@{'/admin/usuario/' + ${usuario.id}}" class="text-blue-500 hover:underline text-sm">Ver</a>
-                    |
-                    <a th:href="@{'/admin/usuario/edit/' + ${usuario.id}}" class="text-green-500 hover:underline text-sm">Editar</a>
+                <td class="px-4 py-2 text-sm text-gray-700 flex gap-0.5" th:if="${usuario.roles.size() == 0}"><div class="bg-blue-500 text-white text-xs p-1 text-center font-bold font-mono rounded-md">sin asignar</div></td>
+                <td class="px-4 py-2 text-xs text-gray-700 flex flex-row gap-0.5"><div th:each="role: ${usuario.getRoles()}" class="bg-blue-500 text-white text-xs p-1 text-center font-bold font-mono rounded-md" th:text="${role.name.replace('ROLE_','').toLowerCase()}">sin asignar</div></td>
+                <td class="px-4 py-2">
+                    <div class="flex gap-1 justify-center">
+                        <a th:href="@{'/admin/usuario/' + ${usuario.id}}" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" x2="12" y1="15" y2="3"/>
+                            </svg>
+                            <span>Ver</span>
+                        </a>
+                        <a th:href="@{'/admin/usuario/edit/' + ${usuario.id}}" class="text-green-600 hover:text-green-800 text-sm font-medium flex items-center space-x-2 ml-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500">
+                                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.78 1.28a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.74v.17a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.78-1.28a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74V4a2 2 0 0 0-2-2Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <span>Editar</span>
+                        </a>
+                    </div>
                 </td>
             </tr>
             </tbody>

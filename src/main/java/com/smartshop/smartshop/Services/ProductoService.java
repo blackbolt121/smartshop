@@ -5,6 +5,7 @@ import com.smartshop.smartshop.Models.UrreaProduct;
 import com.smartshop.smartshop.Models.Vendor;
 import com.smartshop.smartshop.Repositories.ProductRepository;
 import com.smartshop.smartshop.Repositories.VendorRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,9 +63,10 @@ public class ProductoService {
         return producto;
     }
 
+    @Transactional
     public void saveUrreaProductToProduct(UrreaProduct urreaProduct){
 
-
+        Vendor vendor = vendorRepository.findByVendorName(urreaProduct.getMarca().trim()).orElse(null);
         Producto producto = productRepository.findByUrreaProduct(urreaProduct)
                 .orElseGet(() -> Producto.builder()
                         .build());
@@ -74,12 +76,10 @@ public class ProductoService {
         producto.setDescription(urreaProduct.getDescripcionProducto());
         producto.setPrice(urreaProduct.getPrecio());
         producto.setImageUrl(urreaProduct.getFotografia());
-        producto.setVersion(producto.getVersion()==null?0:producto.getVersion()+1);
         producto.setUrreaProduct(urreaProduct);
         producto.setSku(urreaProduct.getCodigo());
+        producto.setVendor(vendor);
         // Establecer vendor si existe
-        vendorRepository.findByVendorName(urreaProduct.getMarca())
-                .ifPresent(producto::setVendor);
 
         productRepository.save(producto);
 

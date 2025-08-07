@@ -8,6 +8,7 @@ import {Link} from "react-router-dom";
 
 
 
+
 interface FooterLinkProps {
     href: string,
     children: string
@@ -109,10 +110,10 @@ const Footer = () => {
                     <div>
                         <h3 className={`text-sm font-semibold ${colors.title} tracking-wider uppercase border-b-2 ${colors.border} pb-2 mb-4`}>Ayuda</h3>
                         <ul className="space-y-3">
-                            <FooterLink href="#">Preguntas Frecuentes</FooterLink>
-                            <FooterLink href="#">Política de Envíos</FooterLink>
-                            <FooterLink href="#">Aviso de Privacidad</FooterLink>
-                            <FooterLink href="#">Contacto</FooterLink>
+                            <FooterLink href="/contact">Contacto</FooterLink>
+                            <FooterLink href="/terminos_y_condiciones">Terminos y Condiciones</FooterLink>
+                            {/*<FooterLink href="#">Aviso de Privacidad</FooterLink>*/}
+                            {/*<FooterLink href="/contact">Contacto</FooterLink>*/}
                         </ul>
                     </div>
 
@@ -126,15 +127,16 @@ const Footer = () => {
                                 <div className="mt-2 space-y-2 text-sm">
                                     <p className="flex items-start"><MapPinIcon /><span>Fracc. Lomas de Balvanera 5A, Balvanera, 76900</span></p>
                                     <a href="mailto:suferred@gmail.com" className="flex items-center text-red-200 hover:text-white transition-colors duration-300"><EnvelopeIcon /><span>suferred@gmail.com</span></a>
-                                    <a href="#" className="flex items-center text-red-200 hover:text-white transition-colors duration-300"><WhatsAppIcon /><span>WhatsApp</span></a>
+                                    <a href="https://api.whatsapp.com/send/?phone=%2B524422711285&text&type=phone_number&app_absent=0" className="flex items-center text-red-200 hover:text-white transition-colors duration-300"><WhatsAppIcon /><span>WhatsApp</span></a>
                                 </div>
                             </div>
 
                             <div className="location-item">
-                                <p className="font-semibold text-white">Morelia, Michoacán</p>
+                                <p className="font-semibold text-white">Querétaro (Santa Rosa)</p>
                                 <div className="mt-2 space-y-2 text-sm">
-                                    <p className="flex items-start"><MapPinIcon /><span>Manuel Muñiz No. 377 A, Col. Juarez, Morelia, 58010</span></p>
-                                    <a href="#" className="flex items-center text-red-200 hover:text-white transition-colors duration-300"><WhatsAppIcon /><span>WhatsApp</span></a>
+                                    <p className="flex items-start"><MapPinIcon /><span>Prolongación Independencia #84 En Santa Rosa Jauregui.</span></p>
+                                    <a href="mailto:ventascoaimsa@gmail.com" className="flex items-center text-red-200 hover:text-white transition-colors duration-300"><EnvelopeIcon /><span>ventascoaimsa@gmail.com</span></a>
+                                    <a href="https://api.whatsapp.com/send/?phone=4461390550&text&type=phone_number&app_absent=0" className="flex items-center text-red-200 hover:text-white transition-colors duration-300"><WhatsAppIcon /><span>WhatsApp</span></a>
                                 </div>
                             </div>
 
@@ -147,7 +149,7 @@ const Footer = () => {
             {/* Barra Inferior de Copyright */}
             <div className="bg-red-900 bg-opacity-75 mt-8 py-4 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto text-center text-xs text-red-200">
-                    &copy; {new Date().getFullYear()} Urrea Store. Todos los derechos reservados.
+                    &copy; {new Date().getFullYear()} Mercado Urrea. Todos los derechos reservados.
                 </div>
             </div>
         </footer>

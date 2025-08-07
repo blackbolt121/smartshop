@@ -17,7 +17,7 @@ buscador.addEventListener("input", () => {
     const coincidencias = productos
         .filter(p =>
             p.name.toLowerCase().includes(termino) ||
-            p.id.toString().includes(termino)
+            p.sku.toLowerCase().includes(termino)
         )
         .slice(0, 20);
 
@@ -67,7 +67,9 @@ function renderTabla() {
         row.innerHTML = `
       <td class="flex items-center gap-4 py-2 px-4">
         <img src="${p.imageUrl}" alt="${p.name}" class="w-12 h-12 object-cover rounded" />
-        <span class="font-medium text-gray-800">${p.name}</span>
+        <div><span class="font-medium text-gray-800">${p.name}</span>
+        <br>
+        <span class="font-mono font-xs font-bold text-gray-900">${p.sku}</span></div>
       </td>
       <td class="text-right text-gray-700 font-semibold py-2 px-4">
         $${p.price.toFixed(2)} x
@@ -81,7 +83,7 @@ function renderTabla() {
     });
 
     const iva = subtotal * 0.16;
-    const total = subtotal + iva + 500;
+    const total = subtotal + iva;
 
     document.getElementById("subtotal").textContent = `$${subtotal.toFixed(2)}`;
     document.getElementById("iva").textContent = `$${iva.toFixed(2)}`;

@@ -30,8 +30,7 @@ public class QuotesController {
         Usuario usuario = userService.getUserByContext();
         return cotizacionRepository.findAllByCorreo(usuario.getEmail());
     }
-
-
+    
     @GetMapping("{id}")
     public ResponseEntity<Cotizacion> getQuotesById(@PathVariable String id){
         log.info("getQuotesById {}", id);

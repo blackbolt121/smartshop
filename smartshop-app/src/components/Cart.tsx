@@ -121,7 +121,7 @@ const Cart = () => {
         console.log(response)
       }
       console.log(cartId)
-      window.location.href = `https://localhost:8080/checkout?cart=${cartId}`
+      window.location.href = `http://mercadourrea.com.mx/checkout?cart=${cartId}`
 
     } catch (error) {
       console.error("Error al enviar el carrito:", error);
@@ -136,6 +136,9 @@ const Cart = () => {
     );
   }, [cartItems]);
 
+  const costoEnvio = useMemo(()=> {
+    return (totalPrice > 2000.0)? 0 : 220;
+  }, [totalPrice]);
 
   async function validateCart() {
 
@@ -176,6 +179,7 @@ const Cart = () => {
     validateCart().then()
   }, [])
 
+
   return (
     <div className="container mx-auto p-4 mb-4">
       <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Tu Carrito</h1>
@@ -206,19 +210,19 @@ const Cart = () => {
                       <span className="font-medium">{(totalPrice).toLocaleString("es-MX",{ style: "currency",
                         currency: "MXN"})} MXN</span>
                     </div>
-                    <div className="flex justify-between text-gray-600">
-                      <span>IVA (16%):</span>
-                      <span className="font-medium">{(totalPrice * 0.16).toLocaleString("es-MX",{ style: "currency",
-                        currency: "MXN"})} MXN</span>
-                    </div>
+                    {/*<div className="flex justify-between text-gray-600">*/}
+                    {/*  <span>IVA (16%):</span>*/}
+                    {/*  <span className="font-medium">{(totalPrice * 0.16).toLocaleString("es-MX",{ style: "currency",*/}
+                    {/*    currency: "MXN"})} MXN</span>*/}
+                    {/*</div>*/}
                     <div className="flex justify-between text-gray-600">
                       <span>Envío:</span>
-                      <span className="font-medium">${(500).toFixed(2)} MXN</span>
+                      <span className="font-medium">${(costoEnvio).toFixed(2)} MXN</span>
                     </div>
                     <div className={"border-b border-slate-200"}></div>
                     <div className="flex justify-between text-xl font-bold text-gray-900">
                       <span>Total a pagar:</span>
-                      <span>{(totalPrice * 1.16 + 500).toLocaleString("es-MX",{ style: "currency",
+                      <span>{(totalPrice + costoEnvio).toLocaleString("es-MX",{ style: "currency",
                            currency: "MXN"})} MXN</span>
                     </div>
                   </div>
@@ -238,43 +242,6 @@ const Cart = () => {
                 </div>
               </div>
             </div>
-              {/*<div className="text-right">*/}
-              {/*  <span className="text-xl text-gray-800">Envio:*/}
-              {/*    <span className="font-bold text-gray-800"> {(500).toLocaleString("es-MX", {*/}
-              {/*      style: "currency",*/}
-              {/*      currency: "MXN",*/}
-              {/*    })} MXN</span>*/}
-              {/*  </span>*/}
-              {/*</div>*/}
-
-
-              {/*<div className="text-right">*/}
-              {/*  <span className="text-xl font-semibold text-gray-800">Total a pagar:*/}
-              {/*    <span className="text-green-600"> {(totalPrice * 1.16 + 500).toLocaleString("es-MX", {*/}
-              {/*      style: "currency",*/}
-              {/*      currency: "MXN",*/}
-              {/*    })} MXN</span>*/}
-              {/*  </span>*/}
-              {/*</div>*/}
-
-              {/*<div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">*/}
-              {/*  <button*/}
-              {/*    onClick={handleClearCart}*/}
-              {/*    className="px-4 py-2 text-sm font-medium text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors"*/}
-              {/*  >*/}
-              {/*    Vaciar carrito*/}
-              {/*  </button>*/}
-
-              {/*  <form onSubmit={handleSubmit}>*/}
-              {/*    <button*/}
-              {/*      type="submit"*/}
-              {/*      className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"*/}
-              {/*    >*/}
-              {/*      Pagar*/}
-              {/*    </button>*/}
-              {/*  </form>*/}
-              {/*</div>*/}
-
           </div>
         </div>
       )}

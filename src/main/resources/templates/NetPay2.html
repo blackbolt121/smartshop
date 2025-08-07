@@ -3,16 +3,22 @@
     <head>
         <meta charset="UTF-8" />
         <title>Pago con NetPay</title>
+        <link rel="icon" type="image/x-icon" href="https://res.cloudinary.com/dv0hzntey/image/upload/v1754238574/urrea_g4nc5s.ico">
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <script src="https://docs.netpay.mx/cdn/js/latest/checkout.plus.js"></script>
-        <script th:if="${cart.getOrdenPago == null}">
+        <script th:if="${cart.getOrdenPago == null}" th:inline="javascript">
+            /*<![CDATA[*/
             const getAccessToken = () => {
                 return localStorage.getItem('access_token');
             };
 
             window.onload = function () {
-                NetPay.init('pk_netpay_JGFtQNUFIENMlhkoBXdgiozmQ');
-                NetPay.setSandboxMode(true);
+
+                const sandbox_mode = /*[[${sandbox_mode}]]*/ true;
+                const public_token = /*[[${public_token}]]*/ ""
+                console.log(sandbox_mode)
+                NetPay.init(public_token);
+                NetPay.setSandboxMode(sandbox_mode);
                 window.onPaymentSuccess = function (r) {
                     console.log('Pago exitoso:', r);
                     const access_token = getAccessToken();
@@ -32,11 +38,11 @@
                 };
                 window.onPaymentError = function (r) {
                     alert('Error en el pago:');
+                    console.log(r)
                 };
             };
-
-
-</script>
+            /*]]>*/
+        </script>
         <style>
             body {
                 font-family: sans-serif;
@@ -81,6 +87,93 @@
             <a th:href="@{/tienda}" class="block text-black hover:text-red-500 font-bold">Tienda</a>
         </div>
     </header>
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <!-- Mensaje de Pago Realizado -->
+        <div th:if="${cart.getOrdenPago() != null}" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-md shadow-md mb-8" role="alert">
+            <p class="font-bold">¡Pago realizado con éxito!</p>
+            <p>Tu número de referencia es: <span class="font-mono bg-green-200 px-2 py-1 rounded" th:text="${cart.getOrdenPago()}"></span></p>
+        </div>
+
+        <!-- Contenido principal si el pago no se ha realizado -->
+        <div th:if="${cart.getOrdenPago() == null}" class="flex flex-col lg:flex-row gap-8">
+
+            <!-- Columna Izquierda: Lista de Productos -->
+            <div class="w-full lg:w-2/3">
+                <div class="bg-white p-6 rounded-lg shadow-md space-y-6">
+                    <!-- Iterar sobre cada item del carrito -->
+                    <div th:each="item, iterStat : ${cart.getItems()}" th:class="'flex items-center gap-6 '">
+                        <!-- Imagen del Producto -->
+                        <img th:src="${item.getProduct().getImageUrl() != null ? item.getProduct().getImageUrl() : '/images/placeholder.png'}"
+                             alt="Imagen del producto"
+                             class="w-24 h-24 object-contain rounded-md bg-gray-100 p-1"/>
+
+                        <!-- Detalles del Producto -->
+                        <div class="flex-grow">
+                            <p class="font-semibold text-gray-800" th:text="${item.getProduct().getName()}">Nombre del Producto</p>
+                            <p class="text-sm text-gray-500" th:text="'Código: ' + ${item.getProduct().getSku()}">Código: PROD123</p>
+                            <p class="text-lg font-bold text-gray-900 mt-2" th:text="${'$' + #numbers.formatDecimal(item.getProduct().getPrice(), 1, 'COMMA', 2, 'POINT')}">$123.00</p>
+                        </div>
+
+                        <!-- Cantidad (opcional, si se quiere mostrar) -->
+                        <div class="text-center">
+                            <p class="text-sm text-gray-500">Cant.</p>
+                            <p class="font-semibold text-gray-800" th:text="${item.getQuantity()}">1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Derecha: Resumen del Pedido -->
+            <div class="w-full lg:w-1/3">
+                <div class="bg-white p-6 rounded-lg shadow-md sticky top-8">
+                    <h2 class="text-xl font-bold text-gray-800 border-b border-gray-200 pb-4 mb-4">Resumen del Pedido</h2>
+
+                    <div class="space-y-3 text-gray-600">
+                        <div class="flex justify-between">
+                            <span>Subtotal:</span>
+                            <span class="font-medium text-gray-800" th:text="${'$' + #numbers.formatDecimal(subtotal, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+<!--                        <div class="flex justify-between">-->
+<!--                            <span>IVA (16%):</span>-->
+<!--                            <span class="font-medium text-gray-800" th:text="${'$' + #numbers.formatDecimal(iva, 1, 'COMMA', 2, 'POINT')}"></span>-->
+<!--                        </div>-->
+                        <div class="flex justify-between">
+                            <span>Envío:</span>
+                            <span class="font-medium text-gray-800" th:text="${'$' + #numbers.formatDecimal(envio, 1, 'COMMA', 2, 'POINT')}"></span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4 border-gray-200">
+
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-lg font-bold text-gray-900">Total a pagar:</span>
+                        <span class="text-2xl font-bold text-gray-900" th:text="${'$' + #numbers.formatDecimal(price, 1, 'COMMA', 2, 'POINT')}"></span>
+                    </div>
+
+                    <!-- Botón de Pago NetPay (lógica intacta, estilo actualizado) -->
+                    <button id="netpay-checkout"
+                            class="w-full block text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                            data-button-title="Pagar"
+                            th:attr="data-token=${token},
+                                     data-street1=${cart.getUsuario().getCalle()},
+                                     data-country=${cart.getUsuario().getPais()},
+                                     data-city=${cart.getUsuario().getCiudad()},
+                                     data-postal-code=${cart.getUsuario().getCodigoPostal()},
+                                     data-phone-number=${cart.getUsuario().getTelefono()},
+                                     data-email=${cart.getUsuario().getEmail()},
+                                     data-product-count=${cart.getItems().size()},
+                                     data-merchant-reference-code=${cart.getId()},
+                                     data-state=${cart.getUsuario().getEstado()}"
+                            data-onsuccess="onPaymentSuccess"
+                            data-onerror="onPaymentError"
+                            data-commerce-name="Urrea Shop">
+                        Continuar Compra
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!--
     <div class="flex flex-col justify-center items-center gap-8 w-[60%] mx-auto">
         <table class="w-full text-center">
             <thead class="bg-red-500 text-white">
@@ -133,5 +226,6 @@
             <p>Referencia: <span class="font-mono" th:text="${cart.getOrdenPago()}"></span></p>
         </div>
     </div>
+    -->
     </body>
 </html>

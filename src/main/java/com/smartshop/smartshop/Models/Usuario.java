@@ -59,7 +59,12 @@ public class Usuario {
     private Set<Role> roles;
 
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE}) // <--- Añade cascade
+    @JoinTable(
+            name = "usuario_roles", // Nombre de la tabla de unión (asociación)
+            joinColumns = @JoinColumn(name = "usuario_id"), // Columna que referencia a Usuario
+            inverseJoinColumns = @JoinColumn(name = "roles_id") // Columna que referencia a Role
+    )
     private Set<Pedidos> pedidos = new HashSet<>();
 
     @PrePersist

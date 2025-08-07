@@ -70,7 +70,7 @@ const Signup = () => {
 
         saveTokens(tokenAuth.access_token, tokenAuth.refresh_token)
 
-        console.log(tokenAuth)
+        //console.log(tokenAuth)
 
         navigate("/")
     };

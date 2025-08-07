@@ -2,19 +2,21 @@ package com.smartshop.smartshop.Controllers;
 
 import com.resend.services.emails.model.SendEmailRequest;
 import com.resend.services.emails.model.SendEmailResponse;
+import com.smartshop.smartshop.Enumeration.PedidoStatus;
 import com.smartshop.smartshop.Models.*;
-import com.smartshop.smartshop.Repositories.CotizacionRepository;
-import com.smartshop.smartshop.Repositories.ProductRepository;
-import com.smartshop.smartshop.Services.AuthService;
-import com.smartshop.smartshop.Services.CartService;
-import com.smartshop.smartshop.Services.JwtService;
-import com.smartshop.smartshop.Services.UserService;
+import com.smartshop.smartshop.Repositories.*;
+import com.smartshop.smartshop.Services.*;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContext;
@@ -23,8 +25,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.resend.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.swing.text.html.Option;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Controller
@@ -38,17 +44,41 @@ public class AdminController {
     private final CartService cartService;
     private final ProductRepository productRepository;
     private final CotizacionRepository cotizacionRepository;
+    private final RoleRepository roleRepository;
+    private final ProductoService productoService;
+    private final UserRepository userRepository;
+    private final PedidoRepository pedidosRepository;
+    private final DashboardService dashboardService;
 
     @GetMapping("")
-    public String index(){
+    public String index(Model model){
         try{
-            userService.getUserByContext();
-            log.info("Redirecting to dashboard");
             return "redirect:/admin/dashboard";
         }catch(Exception e){
             log.info("Redirecting to login...");
             return "redirect:/admin/login";
         }
+    }
+
+    @RequestMapping("/error")
+    public String handleError(HttpServletRequest request) {
+        // Obtenemos el código de estado del error (e.g., 404, 500, 403)
+        Object status = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
+
+        if (status != null) {
+            Integer statusCode = Integer.valueOf(status.toString());
+
+            // Si el error es un 404 (NOT_FOUND), mostramos nuestra página personalizada
+            if (statusCode == HttpStatus.NOT_FOUND.value()) {
+                return "errors/notfound_admin"; // Devuelve el nombre de la plantilla: /templates/error/404.html
+            }
+            // Aquí podrías añadir más 'if' para otros códigos de error, como el 500
+            else if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+                return "error/500"; // Requeriría una plantilla 500.html
+            }
+        }
+        // Para cualquier otro error, puedes devolver una página genérica
+        return "error/error"; // Requeriría una plantilla error.html
     }
 
     @GetMapping("login")
@@ -144,6 +174,21 @@ public class AdminController {
 
 
         model.addAttribute("usuario", u);
+
+        userService.getUserByContext();
+        log.info("Redirecting to dashboard");
+        Long user_count = userRepository.count();
+        Long total_productos = productRepository.count();
+
+
+
+        model.addAttribute("totalUsuarios", user_count);
+        model.addAttribute("totalProductos", total_productos);
+        model.addAttribute("pedidosNuevos", dashboardService.getNuevosPedidosCount());
+        model.addAttribute("ultimosPedidos", dashboardService.getUltimosPedidos());
+        model.addAttribute("ingresosMes", dashboardService.getIngresosMesActual());
+        model.addAttribute("salesDataJson", dashboardService.getSalesDataForChart());
+        model.addAttribute("categoryDataJson", dashboardService.getCategoryDataForChart());
         return "panel";
     }
 
@@ -155,9 +200,64 @@ public class AdminController {
     }
 
     @GetMapping("/orders")
-    public String orders(Model model) {
-        model.addAttribute("orders", cartService.getAllCarts());
+    public String listAllOrders(Model model) {
+        // --- SOLUCIÓN ---
+        // Se obtienen todos los pedidos desde el PedidosRepository,
+        // no los carritos desde un CartService.
+        // findAll() es un método estándar de JpaRepository.
+        List<Pedidos> allOrders = pedidosRepository.findAll();
+        // Se añade la lista de 'Pedidos' al modelo con el nombre "orders",
+        // que es el que la vista de Thymeleaf espera.
+        model.addAttribute("orders", allOrders);
+        // Retorna el nombre del archivo html (sin la extensión).
+        // Asumiendo que tu archivo se llama 'pedidos.html'.
         return "pedidos";
+    }
+
+    @GetMapping("/order/{id}")
+    public String pedido(@PathVariable("id") String id, Model model) {
+        pedidosRepository.findById(Long.valueOf(id));
+        model.addAttribute("order", pedidosRepository.findById(Long.valueOf(id)).orElse(null));
+        model.addAttribute("id", Long.valueOf(id));
+        return "pedido_edit";
+    }
+
+    @PostMapping("/order/update")
+    public String updateOrder(@RequestParam("id") Long id,
+                              @RequestParam("guia") String guia,
+                              @RequestParam("pedidoStatus") String pedidoStatus,
+                              RedirectAttributes redirectAttributes) {
+
+        try {
+            // 1. Recuperar la entidad existente de la base de datos.
+            Pedidos orderToUpdate = pedidosRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("ID de Pedido inválido para actualizar:" + id));
+
+            // 2. Actualizar los campos de la entidad con los nuevos valores.
+            orderToUpdate.setGuia(guia);
+
+            log.info("value {}",pedidoStatus);
+            switch (pedidoStatus) {
+                case "PedidoStatus.EN_PROCESO" -> orderToUpdate.setPedidoStatus(PedidoStatus.EN_PROCESO);
+                case "PedidoStatus.ENVIADO" -> orderToUpdate.setPedidoStatus(PedidoStatus.ENVIADO);
+                case "PedidoStatus.ENTREGADO" -> orderToUpdate.setPedidoStatus(PedidoStatus.ENTREGADO);
+                default -> orderToUpdate.setPedidoStatus(PedidoStatus.CANCELADO);
+            }
+            // orderToUpdate.setPedidoStatus(pedidoStatus);
+
+            // 3. Guardar la entidad. Como la entidad ya existe, JPA ejecutará un UPDATE.
+            pedidosRepository.save(orderToUpdate);
+
+            // 4. Añadir un mensaje de éxito para mostrar en la siguiente página.
+            redirectAttributes.addFlashAttribute("successMessage", "Pedido #" + id + " actualizado correctamente.");
+
+        } catch (Exception e) {
+            // En caso de error, añadir un mensaje de error.
+            redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el pedido: " + e.getMessage());
+        }
+
+        // 5. Redirigir al usuario de vuelta a la lista de pedidos.
+        return "redirect:/admin/orders";
     }
 
     @GetMapping("/logout")
@@ -196,18 +296,18 @@ public class AdminController {
         return ResponseEntity.ok(obj.toString());
     }
 
-    @GetMapping("/order/{id}")
-    public String order(@PathVariable String id, Model model) {
-        Cart cart = cartService.getCartById(id);
-        Double price = cart.getItems().stream().map(cartItem -> cartItem.getProduct().getPrice()).reduce(0.0, Double::sum);
-        String title = String.format("Pedido %s", id);
-        model.addAttribute("cart", cart);
-        model.addAttribute("price", price);
-        model.addAttribute("title", title);
-        model.addAttribute("usuario", cart.getUsuario());
-
-        return "pedido";
-    }
+//    @GetMapping("/order/{id}")
+//    public String order(@PathVariable String id, Model model) {
+//        Cart cart = cartService.getCartById(id);
+//        Double price = cart.getItems().stream().map(cartItem -> cartItem.getProduct().getPrice()).reduce(0.0, Double::sum);
+//        String title = String.format("Pedido %s", id);
+//        model.addAttribute("cart", cart);
+//        model.addAttribute("price", price);
+//        model.addAttribute("title", title);
+//        model.addAttribute("usuario", cart.getUsuario());
+//
+//        return "pedido";
+//    }
 
     @GetMapping("/usuario/{id}")
     public String usuario(@PathVariable String id, Model model) {
@@ -219,7 +319,12 @@ public class AdminController {
     @GetMapping("/usuario/edit/{id}")
     public String usuarioEdit(@PathVariable String id, Model model) {
         Usuario usuario = userService.getUsuario(id).orElse(null);
+
+        List<Role> roles = roleRepository.findAll();
+
         model.addAttribute("usuario", usuario);
+
+        model.addAttribute("roles", roles);
 
         return "usuario-editar";
     }
@@ -266,8 +371,8 @@ public class AdminController {
         String html = this.generarHtmlCotizacion(cotizacion);
 
         SendEmailRequest sendEmailRequest = SendEmailRequest.builder()
-                .from("onboarding@resend.dev")
-                .to("rego199903@gmail.com")
+                .from("cotizacion@mercadourrea.com.mx")
+                .to(cotizacion.getCorreo())//"rego199903@gmail.com")
                 .subject(String.format("Cotizacion: %s", cotizacion.getId()))
                 .html(html)
                 .build();
@@ -278,6 +383,62 @@ public class AdminController {
         model.addAttribute("productos", productos);
 
         return "cotizador";
+    }
+
+
+    @GetMapping("/products")
+    public String listProducts(Model model,
+                               @RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "10") int size,
+                               // Mapea todos los parámetros de filtro de tu @Query
+                               @RequestParam Optional<String> name,
+                               @RequestParam Optional<List<String>> categories,
+                               @RequestParam Optional<Double> minPrice,
+                               @RequestParam Optional<Double> maxPrice,
+                               @RequestParam Optional<String> brand) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Producto> productPage;
+
+        // Decide qué método del repositorio llamar
+        if (name.isPresent() || categories.isPresent() || minPrice.isPresent() || maxPrice.isPresent() || brand.isPresent()) {
+            productPage = productRepository.findByFilters(
+                    name.orElse(null),
+                    categories.orElse(null),
+                    minPrice.orElse(null),
+                    maxPrice.orElse(null),
+                    brand.orElse(null),
+                    pageable
+            );
+        } else {
+            productPage = productRepository.findAll(pageable);
+        }
+
+        model.addAttribute("productPage", productPage);
+
+        // Lógica para generar los números de página a mostrar
+        int totalPages = productPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }
+
+        return "productos"; // El nombre de tu vista principal
+    }
+
+    @GetMapping("/product/{id}")
+    public String showProduct(@PathVariable String id, Model model) {
+
+        log.info(id.toString());
+        Optional<Producto> producto = productoService.getProduct(id);
+
+        Producto product1 = producto.orElse(null);
+
+
+        model.addAttribute("producto", product1);
+        return "producto";
     }
 
     @GetMapping("/quotes/all")
@@ -307,6 +468,7 @@ public class AdminController {
         usuarioExistente.setActivo(usuario.getActivo());
         usuarioExistente.setPais(usuario.getPais());
         usuarioExistente.setTelefono(usuario.getTelefono());
+        usuarioExistente.setRoles(usuario.getRoles());
         userService.save(usuarioExistente);
         return "redirect:/admin/users";
     }
