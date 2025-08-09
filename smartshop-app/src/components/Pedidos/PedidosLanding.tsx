@@ -33,7 +33,7 @@ function PedidosLanding() {
 
 
     useEffect(() => {
-        console.log(`${apiUrl}/rest/api/1/pedidos`)
+        //console.log(`${apiUrl}/rest/api/1/pedidos`)
         fetch(`${apiUrl}/rest/api/1/pedidos`, {
             headers: {
                 Authorization: `Bearer ${getAccessToken()}`,
@@ -43,10 +43,10 @@ function PedidosLanding() {
             .then(res => setPedidos(res.content)).catch(err => console.log(err));
     }, [setPedidos])
 
-    useEffect(()=>{
-        console.log("Pedidos")
-        console.log(pedidos);
-    }, [pedidos]);
+    // useEffect(()=>{
+    //     console.log("Pedidos")
+    //     console.log(pedidos);
+    // }, [pedidos]);
 
 
     // Lógica para filtrar los pedidos
@@ -58,7 +58,7 @@ function PedidosLanding() {
 
         return pedidos.filter(pedido => {
             const searchMatch = searchTerm === '' ||
-                `MX-${pedido.id}`.includes(searchTerm.toLowerCase()) ||
+                `MX-${1000+pedido.id}`.includes(searchTerm.toLowerCase()) ||
                 pedido.pedidoDetails.some(p => p.producto.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
             const statusMatch = statusFilter === 'Todos' || pedido.pedidoStatus === statusFilter;

@@ -43,7 +43,7 @@ const WhatsAppIcon = () => (
 const FooterLink = ({ href, children }: FooterLinkProps) => {
     return <li>
         <Link to={href} onClick={()=>{
-            console.log(href);
+            //console.log(href);
         }} className="text-red-200 hover:text-white hover:underline transition-colors duration-300">
             {children}
         </Link>

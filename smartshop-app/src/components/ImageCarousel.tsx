@@ -1,15 +1,11 @@
 import urrea from "../assets/urrea.jpg";
-// import foy from "../assets/foy.png"
 import surtex from "../assets/surtex.jpg"
-// import prolock from "../assets/prolock.jpg"
 import lock from "../assets/lock.jpg"
 import axios from "axios";
 import { Vendor } from "../store/store";
 import { useEffect, useState } from "react";
 import { getAccessToken } from "../store/auth";
 import { useNavigate } from "react-router-dom";
-// import proforza from "../assets/proforza.jpg"
-// import balta from "../assets/balta.jpg"
 const apiUrl = import.meta.env.VITE_API_URL;
 
 
@@ -42,7 +38,6 @@ const ImageCarousel = () => {
 
         const vendors = request.data
 
-        console.log(vendors)
 
         const arr: string[] = ["Urrea", "Surtek", "Lock"]
 
@@ -77,7 +72,6 @@ const ImageCarousel = () => {
         })
 
         setVendor(vendorsArray.sort((a, b)=> b.name.localeCompare(a.name)))
-        console.log(`Vendor ${vendorsArray.length}`)
     }
 
 

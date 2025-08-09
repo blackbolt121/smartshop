@@ -42,7 +42,7 @@ function App() {
 
           if (cartId != null) {
 
-              console.log(cartId)
+              //console.log(cartId)
 
               const createCart = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`,
                   {
@@ -61,14 +61,14 @@ function App() {
 
               flag = !(ordenPago === null)
 
-              console.log(flag)
-              console.log(ordenPago)
+              //console.log(flag)
+              //console.log(ordenPago)
               if (flag) {
                   dispatch(clearCart())
                   localStorage.removeItem("cartId")
               }
           }else{
-              console.log("No cart assigned")
+              //console.log("No cart assigned")
           }
       }
       validateCart().catch()
@@ -76,20 +76,18 @@ function App() {
 
   useEffect(() => {
     
-    const path = location.pathname
+    //const path = location.pathname
 
-    console.log(path);
+    //console.log(path);
 
     validateToken().then( (validation: boolean) => {
         if(!validation){
-            console.log('Token is invalid')
+            // console.log('Token is invalid')
             removeTokens()
-        }else{
-            console.log("Token valid")
         }
     }).catch((error)=>{
         console.log(error)
-        console.log("Failed to validate");
+        // console.log("Failed to validate");
         removeTokens();
     });
 

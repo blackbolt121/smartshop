@@ -1,7 +1,9 @@
 // Componente para una tarjeta de pedido individual
 import StatusBadge from "./PedidosBadge.tsx";
-import {Product} from "../../store/store.ts";
+import {AppDispatch, Product} from "../../store/store.ts";
 import {useNavigate} from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import {addToCart} from "../../store/cartSlice.ts";
 
 
 interface CartItem{
@@ -27,6 +29,18 @@ const PedidoCard = ({key, pedido} : PedidosCardProps) => {
         month: 'long',
         day: 'numeric'
     });
+
+    const dispatch: AppDispatch = useDispatch();
+
+    const shopAgain = () => {
+
+        pedido.productos.forEach(cartItem => {
+            dispatch(addToCart({
+                producto: cartItem.producto,
+                quantity: cartItem.quantity
+            }));
+        })
+    }
 
     const navigate = useNavigate();
 
@@ -87,7 +101,7 @@ const PedidoCard = ({key, pedido} : PedidosCardProps) => {
                     >
                         Ver Detalles
                     </button>
-                    <button className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-red-700 transition-colors">
+                    <button onClick={shopAgain} className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-red-700 transition-colors">
                         Volver a Pedir
                     </button>
                 </div>

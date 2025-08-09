@@ -51,13 +51,13 @@ const Cart = () => {
 
       let flag = false
       
-      console.log(cartId)
+      //console.log(cartId)
       if (cartId === null) {
-        console.log(`Cart id is null`)
+        //console.log(`Cart id is null`)
         flag = true
       }
       else {
-        console.log('Validando orden de pedido')
+        //console.log('Validando orden de pedido')
         const createCart = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`,
           {
             method: "GET",
@@ -73,8 +73,8 @@ const Cart = () => {
 
         const ordenPago = data.ordenPago
 
-        console.log(ordenPago)
-        console.log(flag)
+        //console.log(ordenPago)
+        //console.log(flag)
 
         flag = !(ordenPago === null)
         //Si existe una orden de pago registrada se limpia el carrito
@@ -83,9 +83,9 @@ const Cart = () => {
         }
 
       }
-      console.log(`The flag is ${flag}`)
+      //console.log(`The flag is ${flag}`)
       if (flag) {
-        console.log(`Creating cart ${flag}`)
+        //console.log(`Creating cart ${flag}`)
         const response = await fetch(`${apiUrl}/rest/api/1/cart/order`, {
           method: "POST",
           headers: {
@@ -104,8 +104,9 @@ const Cart = () => {
         cartId = cart.cartId;
         localStorage.setItem("cartId", String(cartId))
       } else {
-        console.log("Actualizando carrito")
-        const response = await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`, {
+        //console.log("Actualizando carrito")
+        //const response =
+        await fetch(`${apiUrl}/rest/api/1/cart/order/${cartId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -118,9 +119,9 @@ const Cart = () => {
             }))
           )
         });
-        console.log(response)
+        //console.log(response)
       }
-      console.log(cartId)
+      //console.log(cartId)
       window.location.href = `http://mercadourrea.com.mx/checkout?cart=${cartId}`
 
     } catch (error) {
@@ -164,8 +165,8 @@ const Cart = () => {
 
       flag = !(ordenPago === null)
 
-      console.log(flag)
-      console.log(ordenPago)
+      //console.log(flag)
+      //console.log(ordenPago)
       if (flag) {
         dispatch(clearCart())
         localStorage.removeItem("cartId")
@@ -175,7 +176,7 @@ const Cart = () => {
   }
 
   useEffect(() => {
-    console.log(localStorage.getItem("cartId"))
+    //console.log(localStorage.getItem("cartId"))
     validateCart().then()
   }, [])
 

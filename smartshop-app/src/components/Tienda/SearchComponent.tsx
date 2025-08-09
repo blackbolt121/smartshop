@@ -57,7 +57,7 @@ const SearchComponent: React.FC = () => {
         try {
             // Reemplaza esta URL con la tuya
             const url = `${apiUrl}/rest/api/1/producto/search?query=${encodeURIComponent(searchQuery)}`;
-            console.log(url);
+            //console.log(url);
             const response = await axios(url, {
                 method: "GET",
                 headers: {
