@@ -1,5 +1,8 @@
 // --- Componente para la Tarjeta de Cotización Individual ---
 import {Link} from "react-router-dom";
+import {AppDispatch} from "../../store/store.ts";
+import {useDispatch} from "react-redux";
+import {addToCart} from "../../store/cartSlice.ts";
 
 export interface Product {
     id: string;
@@ -65,6 +68,18 @@ const QuoteCard = ({ quote }: { quote: Quote }) => {
     // Función para calcular el total de la cotización.
     const total = quote.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
 
+
+    const dispatch: AppDispatch = useDispatch();
+
+    const shopAgain = () => {
+        quote.items.forEach((item) => {
+            dispatch(addToCart({
+                producto: item.product,
+                quantity: item.quantity,
+            }));
+        })
+    }
+
     // Función para formatear fechas.
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString("es-MX", {
@@ -123,7 +138,7 @@ const QuoteCard = ({ quote }: { quote: Quote }) => {
                         Ver Detalles
                     </Link>
                     <button
-                        onClick={() => console.log(`Creando pedido desde la cotización ${generateQuoteNumberFromUUID(quote.id)}`)}
+                        onClick={shopAgain}
                         className="px-5 py-2 text-sm font-semibold text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                     >
                         Añadir al carrito

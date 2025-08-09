@@ -29,8 +29,8 @@ const PromotionsCarousel = () => {
     try{
       const images = await images_request.data
       setPromotions(images)
-      console.log("Images rendered!!!")
-      console.log(images)
+      //console.log("Images rendered!!!")
+      //console.log(images)
     }catch(error: unknown){
       setError(String(error));
     }
@@ -57,28 +57,28 @@ const PromotionsCarousel = () => {
 
   }, [loading]);
 
-  useEffect(()=>{
-    console.log("Carousel cargando...")
-    console.log(promotions)
-  }, [promotions])
+  // useEffect(()=>{
+  //   //console.log("Carousel cargando...")
+  //   //console.log(promotions)
+  // }, [promotions])
   // Función para cargar datos (ahora simulados)
 
 
   useEffect(() => {
     if (promotions.length > 0) {
-      console.log("Interval")
+      //console.log("Interval")
       const interval = setInterval(() => {
         const index = (currentIndex + 1) % promotions.length;
         setCurrentIndex(index);
       }, 2000); // 4 segundos de autoplay
       return () => clearInterval(interval); // Limpiar el intervalo al desmontar
     }else{
-      console.log("No interval")
+      //console.log("No interval")
     }
-  }, [promotions]);
+  }, [promotions, currentIndex]);
 
   useEffect(() => {
-    console.log(currentIndex)
+    //console.log(currentIndex)
     if(promotions[currentIndex]){
       setImage(`data:image/jpeg;base64,${promotions[currentIndex].image}`)
     }
@@ -118,12 +118,12 @@ const PromotionsCarousel = () => {
               key={"carousel-" + promotions.length}
               className={`p-10 relative z-10`}
           >
-            <img
+            {image && <img
                 src={image}
                 alt={promotions[currentIndex].title}
                 className="max-w-full h-auto object-contain rounded-lg flex justify-center items-center p-1"
                 style={{maxHeight: '500px'}}
-            />
+            />}
           </div>
         </div>
 
@@ -165,57 +165,3 @@ const PromotionsCarousel = () => {
 };
 
 export default PromotionsCarousel
-/*
-
-const PromotionsCarousel = () => {
-  const [promotions, setPromotions] = useState([]);
-
-  const loadImages = async () => {
-    const images_request = await axios.get('http://localhost:8080/rest/api/1/promotions', {
-      headers: {
-        "Authorization": `Bearer ${getAccessToken()}`
-      }
-    })
-
-    const images = await images_request.data
-
-    setPromotions(images)
-    console.log("Images rendered!!!")
-    console.log(images)
-  }
-  useEffect(() => {
-
-  }, []);
-
-  useEffect(()=>{
-    console.log("Carousel cargando...")
-    console.log(promotions)
-  }, [promotions])
-
-  const settings = {
-    dots: true,
-    infinite: true,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    lazyLoad: 'ondemand' as const,
-    autoplay: true,
-    autoplaySpeed: 4000,
-    arrows: true,
-  };
-
-  return (
-    <div className='max-w-[90%] mx-auto my-2'>
-      <Slider {...settings}>
-        {promotions.map(({ title, id, image }) => {
-          const imageSrc = `data:image/jpeg;base64,${image}`;
-          // Suponiendo que la imagen es JPEG en base64 sin prefijo
-          console.log("iMAGE IN ARRAY")
-          return <div key={id}><img src={imageSrc} alt={title} /></div>
-        })}
-      </Slider>
-    </div>
-  );
-};
-
-export default PromotionsCarousel;
-*/

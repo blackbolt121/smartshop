@@ -54,7 +54,7 @@ const CartItemCard = ({ id, quantity, sku }: CartItemCardProps) => {
         console.error("Error fetching producto:", err);
         setLoading(false);
       });
-    console.log(producto)
+    //console.log(producto)
   }, [id]);
 
   const handleRemove = () => {

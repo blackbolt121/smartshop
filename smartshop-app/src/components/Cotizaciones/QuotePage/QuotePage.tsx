@@ -1,9 +1,10 @@
-import {Product} from "../../../store/store.ts"
+import {AppDispatch, Product} from "../../../store/store.ts"
 import {useEffect, useMemo, useState} from "react";
 import {useParams} from "react-router-dom";
 import axios from "axios";
 import {getAccessToken} from "../../../store/auth.ts";
-
+import { useDispatch } from 'react-redux';
+import {addToCart} from "../../../store/cartSlice.ts";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -75,6 +76,17 @@ const QuotePage = () => {
     const [quote, setQuote] = useState<Quote>();
     const {id} = useParams();
 
+    const dispatch: AppDispatch = useDispatch();
+
+    const shopAgain = () => {
+        quote?.items?.forEach((item) => {
+            dispatch(addToCart({
+                producto: item.product,
+                quantity: item.quantity,
+            }));
+        })
+    }
+
     useEffect(() => {
         async function loadQuote(){
             try{
@@ -86,30 +98,34 @@ const QuotePage = () => {
                 const quoteData : Quote = quoteRequest.data
                 setQuote(quoteData)
             }catch{
-                console.log(`Failed to load quote: ${id}`)
+                //console.log(`Failed to load quote: ${id}`)
             }
         }
 
         loadQuote().catch()
-    }, [])
+    }, [id])
 
     // --- Cálculos para el resumen ---
-    const shippingCost = 500.00; // Valor de ejemplo para el envío
-    const taxRate = 0.16; // 16% de IVA
+     // Valor de ejemplo para el envío
 
     const subtotal  = useMemo(() => {
-        console.log("Calculando subtotal..."); // Para demostrar que solo se ejecuta cuando es necesario
+        // console.log("Calculando subtotal..."); // Para demostrar que solo se ejecuta cuando es necesario
         if(quote){
             return (quote.items.length > 0)? quote.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0): 0;
         }
         return 0;
     }, [quote]);
-    const taxAmount = useMemo(()=>{
-        return subtotal * taxRate;
+
+    const shippingCost = useMemo(()=>{
+        if(subtotal < 0){
+            return 0
+        }
+        return subtotal > 200? 0 : 220;
     }, [subtotal]);
+
     const total = useMemo(()=> {
-        return subtotal + taxAmount + shippingCost;
-    }, [subtotal, taxAmount]);
+        return subtotal + shippingCost;
+    }, [subtotal, shippingCost]);
 
     return (
         (quote)?<div className="bg-gray-50 min-h-screen p-4 sm:p-6 md:p-8 font-sans">
@@ -160,10 +176,6 @@ const QuotePage = () => {
                                     <span>Envío (estimado)</span>
                                     <span>{formatCurrency(shippingCost)}</span>
                                 </div>
-                                <div className="flex justify-between text-gray-600">
-                                    <span>IVA (16%)</span>
-                                    <span>{formatCurrency(taxAmount)}</span>
-                                </div>
                                 <hr className="my-2"/>
                                 <div className="flex justify-between font-bold text-xl text-gray-900">
                                     <span>Total</span>
@@ -171,8 +183,8 @@ const QuotePage = () => {
                                 </div>
                             </div>
                             <div className="p-4 bg-gray-50/75 rounded-b-lg">
-                                <button className="w-full px-5 py-3 text-sm font-semibold text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
-                                    Crear Pedido con esta Cotización
+                                <button className="w-full px-5 py-3 text-sm font-semibold text-white bg-red-600 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors" onClick={shopAgain}>
+                                    Agregar al carrito
                                 </button>
                             </div>
                         </div>
