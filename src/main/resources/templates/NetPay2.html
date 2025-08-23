@@ -34,7 +34,9 @@
                         body: JSON.stringify({"transactionId": r.transactionDto.orderId})
                     })
                         .then(()=>{})
-                        .catch(()=>{})
+                        .catch((error)=>{
+                            console.log(error)
+                        })
                 };
                 window.onPaymentError = function (r) {
                     alert('Error en el pago:');

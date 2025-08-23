@@ -67,9 +67,9 @@ export default function PedidosPage() {
 
     }, [id]);
 
-    useEffect(() => {
-        console.log(order)
-    }, [order]);
+    // useEffect(() => {
+    //     //console.log(order)
+    // }, [order]);
 
     return  (!order)?   <div>Cargando pedido...</div> :
         <div className="bg-gray-50 min-h-screen">

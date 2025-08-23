@@ -58,13 +58,13 @@ const Login = () => {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card variant="outlined" className="w-full max-w-sm p-8 space-y-6">
         <Typography level="h4">
-          Login
+          Inicia sesión
         </Typography>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <FormControl required>
                 <FormLabel htmlFor="email">
-                    Email
+                    Correo
                 </FormLabel>
                 <Input
                 name="email"
@@ -79,7 +79,7 @@ const Login = () => {
           <div>
             <FormControl required>
                 <FormLabel>
-                    Password:
+                    Contraseña
                 </FormLabel>
                 <Input
                     name="password"
@@ -93,14 +93,14 @@ const Login = () => {
           </div>
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button type="submit" fullWidth>
-            Login
+            Inicia sesión
           </Button>
         </form>
         <div className="text-center">
           <Typography level="body-lg" color="primary">
-            Don't have an account?{" "}
+            ¿No tienes una cuenta?{" "}
             <Link to="/signup" className="text-indigo-600 hover:underline">
-              Sign up
+              Registrate
             </Link>
           </Typography>
         </div>

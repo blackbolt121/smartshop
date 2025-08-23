@@ -100,16 +100,16 @@ const FiltersSidebar = ({ filters, setFilters  } : FiltersSideBarProps) => {
                         type="number"
                         placeholder="Min"
                         className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        value={filters.maxPrice}
-                        onChange={e => setFilters({...filters, maxPrice: e.target.value})}
+                        value={filters.minPrice}
+                        onChange={e => setFilters({...filters, minPrice: e.target.value})}
                     />
                     <span className="text-gray-500">-</span>
                     <input
                         type="number"
                         placeholder="Max"
                         className="w-full p-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        value={filters.minPrice}
-                        onChange={e => setFilters({...filters, minPrice: e.target.value})}
+                        value={filters.maxPrice}
+                        onChange={e => setFilters({...filters, maxPrice: e.target.value})}
                     />
                 </div>
             </div>
