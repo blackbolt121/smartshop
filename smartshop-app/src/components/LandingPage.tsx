@@ -46,28 +46,28 @@ const LandingPage = () => {
         //console.log(`Bearer ${getAccessToken()}`)
 
         try{
-            console.log({
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "Authorization": `Bearer ${getAccessToken()}`
-            })
+            // console.log({
+            //     "Content-Type": "application/json",
+            //     "Accept": "application/json",
+            //     "Authorization": `Bearer ${getAccessToken()}`
+            // })
             const productRequest = await axios.get<Product[]>(`${apiUrl}/rest/api/1/producto/top`, {
                 headers: {
                     "Authorization": `Bearer ${getAccessToken()}`
                 }
             })
             
-            console.log(productRequest.status)
+            //console.log(productRequest.status)
             if (productRequest.status !== 200) {
                 console.log("Error fetching products")
                 return
             }
     
-            console.log(productRequest.data)
+            //console.log(productRequest.data)
             setProducts(productRequest.data)
-            console.log("Products loaded")
+            //console.log("Products loaded")
         }catch(error){
-            console.log("Error fetching products")
+            //console.log("Error fetching products")
             console.log(error)
             return
         }

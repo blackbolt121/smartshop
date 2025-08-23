@@ -110,7 +110,7 @@ export const Tienda = () => {
                 if (filters.brand) queryParams.append("brand", filters.brand);
 
                 const url = `${apiUrl}/rest/api/1/producto/all?${queryParams.toString()}`;
-                console.log(url)
+                //console.log(url)
 
                 const productRequest = await axios.get<AllProductRequest>(url, {
                     headers: {
@@ -121,7 +121,7 @@ export const Tienda = () => {
                 });
 
                 if (productRequest.status !== 200) {
-                    console.log("Error fetching products");
+                    //console.log("Error fetching products");
                     return;
                 }
 

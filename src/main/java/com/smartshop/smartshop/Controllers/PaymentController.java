@@ -33,7 +33,7 @@ public class PaymentController {
         Function<Double, Double> costoPedido = (_precio) ->
                 (_precio >= 2000.0) ? 0.0 : 220;
         log.info("Costo pedido: {} {}", costoPedido.apply(precio), precio);
-        return 10.0; //costoPedido.apply(precio);
+        return costoPedido.apply(precio);
     }
 
     @GetMapping("/checkout")
