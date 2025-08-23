@@ -125,16 +125,16 @@ const SearchComponent: React.FC = () => {
                             <li className="p-4 text-center text-gray-500">No se encontraron resultados.</li>
                         )}
 
-                        {!isLoading && results.length > 0 && (
-                            <li>
-                                <a
-                                    href={`/buscar?q=${encodeURIComponent(query)}`}
-                                    className="block w-full text-center p-4 bg-blue-500 text-white font-bold rounded-b-lg hover:bg-blue-600 transition-colors duration-150"
-                                >
-                                    Ver todos los resultados
-                                </a>
-                            </li>
-                        )}
+                        {/*{!isLoading && results.length > 0 && (*/}
+                        {/*    <li>*/}
+                        {/*        <a*/}
+                        {/*            href={`/buscar?q=${encodeURIComponent(query)}`}*/}
+                        {/*            className="block w-full text-center p-4 bg-blue-500 text-white font-bold rounded-b-lg hover:bg-blue-600 transition-colors duration-150"*/}
+                        {/*        >*/}
+                        {/*            Ver todos los resultados*/}
+                        {/*        </a>*/}
+                        {/*    </li>*/}
+                        {/*)}*/}
                     </ul>
                 </div>
             )}

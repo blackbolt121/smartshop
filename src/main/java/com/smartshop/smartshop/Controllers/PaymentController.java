@@ -30,12 +30,10 @@ public class PaymentController {
 
 
     private Double costoEnvio(double precio){
-
-
         Function<Double, Double> costoPedido = (_precio) ->
                 (_precio >= 2000.0) ? 0.0 : 220;
         log.info("Costo pedido: {} {}", costoPedido.apply(precio), precio);
-        return costoPedido.apply(precio);
+        return 10.0; //costoPedido.apply(precio);
     }
 
     @GetMapping("/checkout")

@@ -20,7 +20,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate()
   const [token, setToken] = useState<string>("")
-  const [logText, setLogText] = useState<string>("Log In")
+  const [logText, setLogText] = useState<string>("Inicia sesión")
 
   const location = useLocation()
 
@@ -42,9 +42,9 @@ const Navbar = () => {
 
   useEffect(()=>{
     if(token){
-      setLogText("Log out")
+      setLogText("Cerrar sesión")
     }else{
-      setLogText("Sign In")
+      setLogText("Inicia sesión")
     }
   }, [token])
 

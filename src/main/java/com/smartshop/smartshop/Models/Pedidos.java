@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 @Entity
 @Table(name = "pedidos")
@@ -65,12 +66,18 @@ public class Pedidos {
         detail.setPedidos(this); // Sincroniza la relación en ambos sentidos
         System.out.println("--- ASOCIACIÓN COMPLETA. El campo 'pedidos' en el detalle es null? " + (detail.getPedidos() == null));
     }
+    private Double costoEnvio(double precio){
+        Function<Double, Double> costoPedido = (_precio) ->
+                (_precio >= 2000.0) ? 0.0 : 220;
+        return costoPedido.apply(precio);
+    }
 
     public void calcularTotal() {
         this.total = this.pedidoDetails.stream()
                 .mapToDouble(detail -> detail.getStatic_price() * detail.getQuantity())
                 .sum();
-        this.total = this.total * 1.17;
-        this.total += 500;
+
+        this.total = this.costoEnvio(this.total);
+
     }
 }

@@ -1,10 +1,49 @@
 import React, { useEffect, useState } from "react";
-import { FormControl, Input, Button, Card, Typography, FormHelperText, FormLabel } from "@mui/joy";
+import { FormControl, Input, Button, Card, Typography, FormHelperText, FormLabel, Select, Option } from "@mui/joy";
 import {Link, useNavigate} from "react-router-dom"
 import axios from "axios";
 import { TokenPayload } from "../types/TokenPayload";
 import {saveTokens, getAccessToken} from "../store/auth"
 const apiUrl = import.meta.env.VITE_API_URL;
+import municipiosPorEstado from "../estados.ts";
+
+
+const estadosDeMexico = [
+    { label: 'Aguascalientes', value: 'AG' },
+    { label: 'Baja California', value: 'BC' },
+    { label: 'Baja California Sur', value: 'BS' },
+    { label: 'Campeche', value: 'CM' },
+    { label: 'Chiapas', value: 'CS' },
+    { label: 'Chihuahua', value: 'CH' },
+    { label: 'Ciudad de México', value: 'CX' },
+    { label: 'Coahuila', value: 'CO' },
+    { label: 'Colima', value: 'CL' },
+    { label: 'Durango', value: 'DG' },
+    { label: 'Guanajuato', value: 'GT' },
+    { label: 'Guerrero', value: 'GR' },
+    { label: 'Hidalgo', value: 'HG' },
+    { label: 'Jalisco', value: 'JA' },
+    { label: 'México', value: 'EM' },
+    { label: 'Michoacán', value: 'MI' },
+    { label: 'Morelos', value: 'MO' },
+    { label: 'Nayarit', value: 'NA' },
+    { label: 'Nuevo León', value: 'NL' },
+    { label: 'Oaxaca', value: 'OA' },
+    { label: 'Puebla', value: 'PU' },
+    { label: 'Querétaro', value: 'QT' },
+    { label: 'Quintana Roo', value: 'QR' },
+    { label: 'San Luis Potosí', value: 'SL' },
+    { label: 'Sinaloa', value: 'SI' },
+    { label: 'Sonora', value: 'SO' },
+    { label: 'Tabasco', value: 'TB' },
+    { label: 'Tamaulipas', value: 'TM' },
+    { label: 'Tlaxcala', value: 'TL' },
+    { label: 'Veracruz', value: 'VE' },
+    { label: 'Yucatán', value: 'YU' },
+    { label: 'Zacatecas', value: 'ZA' },
+];
+
+
 
 const Signup = () => {
 
@@ -18,13 +57,13 @@ const Signup = () => {
     const [calle, setCalle] = useState("");
     const [ciudad, setCiudad] = useState("");
     const [estadoDir, setEstadoDir] = useState(""); // para evitar conflicto con palabra reservada
-    const [pais, setPais] = useState("");
+    const [pais, setPais] = useState("MX");
     const [codigoPostal, setCodigoPostal] = useState("");
 
 
 
     useEffect(()=> {
-        let token = getAccessToken()
+        const token = getAccessToken()
         if(token){
             navigate("/")
         }
@@ -35,21 +74,21 @@ const Signup = () => {
 
         // Validar si las contraseñas coinciden
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
+            setError("Las contraseñas no son coinciden");
             return;
         }
 
         // Validar si todos los campos están completos
         if (!name || !email || !password || !confirmPassword) {
-            setError("All fields are required");
+            setError("Todos los campos son requeridos");
             return;
         }
 
         // Aquí iría el código para crear el usuario (enviar a un backend, etc.)
         setError(null); // Limpiar el error
-        alert("Signup")
+        //alert("Signup")
 
-        let request  = await axios.post(`${apiUrl}/auth/register`, {
+        const request  = await axios.post(`${apiUrl}/auth/register`, {
             email,
             password,
             name,
@@ -79,13 +118,13 @@ const Signup = () => {
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
             <Card variant="outlined" className="w-full 2xl:max-w-2xl xl:max-w-2xl lg:max-w-lg md:max-w-md sm:max-w-sm p-8 space-y-6 my-10">
                 <Typography level="h4" sx={{ textAlign: "center" }}>
-                    Sign Up
+                    Registrarte
                 </Typography>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <FormControl required>
                             <FormLabel required>
-                                Name
+                                Nombre
                             </FormLabel>
                             <Input
                                 placeholder="Name"
@@ -101,7 +140,7 @@ const Signup = () => {
                     <div>
                         <FormControl required>
                             <FormLabel htmlFor="email">
-                                Email
+                                Correo Electronico
                             </FormLabel>
                             <Input
                                 name="email"
@@ -119,7 +158,7 @@ const Signup = () => {
                     <div>
                         <FormControl required>
                             <FormLabel htmlFor="password">
-                                Password
+                                Contraseña
                             </FormLabel>
                             <Input
                                 name="password"
@@ -137,7 +176,7 @@ const Signup = () => {
                     <div>
                         <FormControl required>
                             <FormLabel htmlFor="confirmpassword">
-                                Confirm password
+                                Confirma contraseña
                             </FormLabel>
                             <Input
                                 name="confirmpassword"
@@ -164,40 +203,59 @@ const Signup = () => {
                         </FormControl>
 
                         <FormControl>
-                            <FormLabel>Calle</FormLabel>
-                            <Input
-                            placeholder="Calle"
-                            value={calle}
-                            onChange={(e) => setCalle(e.target.value)}
-                            />
-                        </FormControl>
-
-                        <FormControl>
-                            <FormLabel>Ciudad</FormLabel>
-                            <Input
-                            placeholder="Ciudad"
-                            value={ciudad}
-                            onChange={(e) => setCiudad(e.target.value)}
-                            />
+                            <FormLabel>País</FormLabel>
+                            <Select defaultValue={"MX"} onChange={(_,value) => setPais(value?value:"MX")}>
+                                <Option value={"MX"} >Mexico</Option>
+                            </Select>
                         </FormControl>
 
                         <FormControl>
                             <FormLabel>Estado</FormLabel>
-                            <Input
-                            placeholder="Estado"
-                            value={estadoDir}
-                            onChange={(e) => setEstadoDir(e.target.value)}
-                            />
+                            {/*<Input*/}
+                            {/*placeholder="Estado"*/}
+                            {/*value={estadoDir}*/}
+                            {/*onChange={(e) => setEstadoDir(e.target.value)}*/}
+                            {/*/>*/}
+                            <Select
+                                placeholder="Selecciona un estado..."
+                                value={estadoDir}
+                                onChange={(_, value) => setEstadoDir(value?value:"QT")}
+                            >
+                                {estadosDeMexico.map((estado) => (
+                                    <Option key={estado.value} value={estado.value}>
+                                        {estado.label}
+                                    </Option>
+                                ))}
+                            </Select>
                         </FormControl>
 
                         <FormControl>
-                            <FormLabel>País</FormLabel>
+                            <FormLabel>Ciudad</FormLabel>
+                            <Select
+                                placeholder="Selecciona una ciudad..."
+                                value={ciudad}
+                                // Deshabilita el dropdown de ciudad si no hay un estado seleccionado
+                                disabled={!estadoDir}
+                                onChange={(_, nuevaCiudad) => setCiudad(nuevaCiudad?nuevaCiudad:"")}
+                            >
+                                <Option value={""}>Sin seleccionar</Option>
+                                {estadoDir && municipiosPorEstado[`${estadoDir}`].map((ciudad) => (
+                                    <Option key={ciudad} value={ciudad}>
+                                        {ciudad}
+                                    </Option>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <FormControl>
+                            <FormLabel>Calle</FormLabel>
                             <Input
-                            placeholder="País"
-                            value={pais}
-                            onChange={(e) => setPais(e.target.value)}
+                                placeholder="Calle"
+                                value={calle}
+                                onChange={(e) => setCalle(e.target.value)}
                             />
                         </FormControl>
+
 
                         <FormControl>
                             <FormLabel>Código Postal</FormLabel>
@@ -213,14 +271,14 @@ const Signup = () => {
                         <p className="text-red-500 text-sm">{error}</p>
                     )}
                     <Button type="submit" fullWidth>
-                        Sign Up
+                        Registrate
                     </Button>
                 </form>
                 <div className="text-center">
                     <Typography level="body-lg" color="primary">
-                        Already have an account?{" "}
+                        ¿Ya tienes una cuenta?{" "}
                         <Link to="/login" className="text-indigo-600 hover:underline">
-                            Log in
+                            Inicia sesión
                         </Link>
                     </Typography>
                 </div>
