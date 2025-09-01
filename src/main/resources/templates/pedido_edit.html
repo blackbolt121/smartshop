@@ -73,6 +73,11 @@
                             </option>
                         </select>
                     </div>
+                    <div>
+                        <label for="fecha_entrega" class="block text-sm font-medium text-gray-700 mb-1">Fecha envio: <span th:if="*{fecha_envio}" th:text="'(programado el ' + *{fecha_envio} + ')'"></span></label>
+                        <input id="fecha_entrega" type="date" th:field="*{fecha_envio}" class="border rounded w-full py-2 px-3">
+
+                    </div>
                 </div>
 
                 <div class="mt-6 text-right">

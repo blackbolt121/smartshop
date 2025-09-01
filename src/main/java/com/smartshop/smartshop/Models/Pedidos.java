@@ -42,6 +42,8 @@ public class Pedidos {
     private LocalDateTime createdAt;
     @Column
     private LocalDateTime updatedAt;
+    @Column
+    private LocalDateTime fecha_envio;
 
     // --- Métodos de Ayuda ---
 

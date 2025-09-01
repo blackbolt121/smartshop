@@ -28,6 +28,8 @@ import com.resend.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -226,6 +228,7 @@ public class AdminController {
     public String updateOrder(@RequestParam("id") Long id,
                               @RequestParam("guia") String guia,
                               @RequestParam("pedidoStatus") String pedidoStatus,
+                              @RequestParam("fecha_envio") String fecha_entrega,
                               RedirectAttributes redirectAttributes) {
 
         try {
@@ -244,6 +247,14 @@ public class AdminController {
                 default -> orderToUpdate.setPedidoStatus(PedidoStatus.CANCELADO);
             }
             // orderToUpdate.setPedidoStatus(pedidoStatus);
+            log.info("value {}",fecha_entrega);
+            StringBuilder fechaBuilder = new StringBuilder();
+            fechaBuilder.append(fecha_entrega);
+            fechaBuilder.append(" ");
+            fechaBuilder.append("23:59:59");
+            LocalDateTime fechaEntrega = LocalDateTime.parse(fechaBuilder.toString(),  DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            log.info("value {}",fechaEntrega.getDayOfWeek());
+            orderToUpdate.setFecha_envio(fechaEntrega);
 
             // 3. Guardar la entidad. Como la entidad ya existe, JPA ejecutará un UPDATE.
             pedidosRepository.save(orderToUpdate);
@@ -253,6 +264,7 @@ public class AdminController {
 
         } catch (Exception e) {
             // En caso de error, añadir un mensaje de error.
+            log.error("Error al actualizar pedido #" + id, e);
             redirectAttributes.addFlashAttribute("errorMessage", "Error al actualizar el pedido: " + e.getMessage());
         }
 
