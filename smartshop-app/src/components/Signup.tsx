@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { FormControl, Input, Button, Card, Typography, FormHelperText, FormLabel, Select, Option } from "@mui/joy";
+import {
+    FormControl,
+    Input,
+    Button,
+    Card,
+    Typography,
+    FormHelperText,
+    FormLabel,
+    Select,
+    Option,
+    Snackbar, IconButton
+} from "@mui/joy";
 import {Link, useNavigate} from "react-router-dom"
 import axios from "axios";
 import { TokenPayload } from "../types/TokenPayload";
 import {saveTokens, getAccessToken} from "../store/auth"
 const apiUrl = import.meta.env.VITE_API_URL;
 import municipiosPorEstado from "../estados.ts";
+import {Close, Warning} from "@mui/icons-material";
 
 
 const estadosDeMexico = [
@@ -59,6 +71,7 @@ const Signup = () => {
     const [estadoDir, setEstadoDir] = useState(""); // para evitar conflicto con palabra reservada
     const [pais, setPais] = useState("MX");
     const [codigoPostal, setCodigoPostal] = useState("");
+    const [open, setOpen] = useState(false);
 
 
 
@@ -87,31 +100,36 @@ const Signup = () => {
         // Aquí iría el código para crear el usuario (enviar a un backend, etc.)
         setError(null); // Limpiar el error
         //alert("Signup")
+        try {
+            const request  = await axios.post(`${apiUrl}/auth/register`, {
+                email,
+                password,
+                name,
+                telefono,
+                calle,
+                ciudad,
+                estado: estadoDir,
+                pais,
+                codigoPostal
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            const tokenAuth: TokenPayload = request.data
+            saveTokens(tokenAuth.access_token, tokenAuth.refresh_token)
+            navigate("/")
+        }catch{
+            setOpen(true)
+        }
 
-        const request  = await axios.post(`${apiUrl}/auth/register`, {
-            email,
-            password,
-            name,
-            telefono,
-            calle,
-            ciudad,
-            estado: estadoDir,
-            pais,
-            codigoPostal
-        }, {
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            }
-        })
 
-        const tokenAuth: TokenPayload = request.data
 
-        saveTokens(tokenAuth.access_token, tokenAuth.refresh_token)
 
         //console.log(tokenAuth)
 
-        navigate("/")
+
     };
 
     return (
@@ -283,6 +301,33 @@ const Signup = () => {
                     </Typography>
                 </div>
             </Card>
+            <Snackbar
+                //autoHideDuration={3000}
+                open={open}
+                variant={"solid"}
+                color={"danger"}
+                onClose={(_, reason) => {
+                    if (reason === 'clickaway') {
+                        return;
+                    }
+                    setOpen(false);
+                }}
+                sx={{display: "flex", alignItems: "center", justifyContent: "space-between"}}
+            >
+                <Warning color={"warning"}/>
+                <Typography level="body-md" sx={{color: "white"}}>
+                    Error al registrar, verifica los campos o el correo ya puede haber sido registrado
+                </Typography>
+                <IconButton
+                    variant="plain"
+                    sx={{
+                        '--IconButton-size': '32px',
+                    }}
+                    onClick={() => {setOpen(false);}}
+                >
+                    <Close sx={{color: "white", ":hover":{color: "black"}}}/>
+                </IconButton>
+            </Snackbar>
         </div>
     );
 };
