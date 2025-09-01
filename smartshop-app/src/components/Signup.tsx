@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { FormControl, Input, Button, Card, Typography, FormHelperText, FormLabel, Select, Option } from "@mui/joy";
+import {
+    FormControl,
+    Input,
+    Button,
+    Card,
+    Typography,
+    FormHelperText,
+    FormLabel,
+    Select,
+    Option,
+    Snackbar, IconButton
+} from "@mui/joy";
 import {Link, useNavigate} from "react-router-dom"
 import axios from "axios";
 import { TokenPayload } from "../types/TokenPayload";
 import {saveTokens, getAccessToken} from "../store/auth"
 const apiUrl = import.meta.env.VITE_API_URL;
 import municipiosPorEstado from "../estados.ts";
+import {Close, Warning} from "@mui/icons-material";
 
 
 const estadosDeMexico = [
@@ -59,6 +71,7 @@ const Signup = () => {
     const [estadoDir, setEstadoDir] = useState(""); // para evitar conflicto con palabra reservada
     const [pais, setPais] = useState("MX");
     const [codigoPostal, setCodigoPostal] = useState("");
+    const [open, setOpen] = useState(false);
 
 
 
@@ -108,7 +121,7 @@ const Signup = () => {
         const tokenAuth: TokenPayload = request.data
 
         saveTokens(tokenAuth.access_token, tokenAuth.refresh_token)
-
+        setOpen(true)
         //console.log(tokenAuth)
 
         navigate("/")
@@ -283,6 +296,32 @@ const Signup = () => {
                     </Typography>
                 </div>
             </Card>
+            <Snackbar
+                autoHideDuration={3000}
+                open={open}
+                variant={"solid"}
+                color={"danger"}
+                onClose={(_, reason) => {
+                    if (reason === 'clickaway') {
+                        return;
+                    }
+                    setOpen(false);
+                }}
+            >
+                <Warning color={"warning"}/>
+                <Typography level="body-md">
+                    Error al registrar, verifica los campos o el correo ya puede haber sido registrado
+                </Typography>
+                <IconButton
+                    variant="plain"
+                    sx={{
+                        '--IconButton-size': '32px',
+                        transform: 'translate(0.5rem, -0.5rem)',
+                    }}
+                >
+                    <Close />
+                </IconButton>
+            </Snackbar>
         </div>
     );
 };
