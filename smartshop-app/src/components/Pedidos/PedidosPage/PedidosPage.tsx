@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useMemo} from 'react';
 import PaymentSummary from './PaymentSummary';
 import PedidosProductList from "./PedidosProductList.tsx";
 import OrderStatus from './OrderStatus';
@@ -6,6 +6,7 @@ import {Product} from "../../../store/store.ts";
 import {Link, useParams} from "react-router-dom";
 import {getAccessToken} from "../../../store/auth.ts";
 import PedidosBadge from "../PedidosBadge.tsx";
+
 
 // --- DATOS DE EJEMPLO ---
 // En una aplicación real, estos datos vendrían de una API.
@@ -27,7 +28,8 @@ interface Pedido {
     pedidoDetails: PedidoDetail[]
     total: number;
     createdAt: string,
-    updatedAt: string
+    updatedAt: string,
+    fecha_envio?: string
 }
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -45,6 +47,26 @@ const translateStatus = (status: string) => {
         default:
             return "En proceso"
     }
+}
+
+function calcularIVA(precioConIVA: number, tasa: number = 0.16): number {
+    return precioConIVA * (tasa / (1 + tasa));
+}
+
+function calcularPrecioSinIVA(precioConIVA: number): number {
+    return precioConIVA / (1.16);
+}
+
+interface FechaEntregaComponentProps {
+    fechaEntrega?: string
+}
+
+
+const FechaEntregaComponent  = ({fechaEntrega} :FechaEntregaComponentProps)=> {
+
+    return <div className="mt-2 flex items-center">
+        <span>Fecha programada de entrega <span className="bg-gray-200 px-2 py-1 rounded-2xl">{`${fechaEntrega? fechaEntrega.split("T")[0]:"Por definir"}`}</span></span>
+    </div>
 }
 
 // --- COMPONENTE PRINCIPAL DE LA APLICACIÓN ---
@@ -67,6 +89,27 @@ export default function PedidosPage() {
 
     }, [id]);
 
+
+    const precioSinIva = useMemo(()=>{
+        return (order)? order.pedidoDetails.reduce((previousValue: number, currentValue: PedidoDetail)=> previousValue + calcularPrecioSinIVA(currentValue.static_price), 0) : 0.0
+    }, [order])
+
+    const iva = useMemo(()=> {
+        return order? order.pedidoDetails.reduce((previousValue: number, currentValue: PedidoDetail)=> previousValue + calcularIVA(currentValue.static_price), 0) : 0.0;
+    }, [order]);
+
+    const subtotal = useMemo(()=> {
+        return precioSinIva + iva
+    }, [precioSinIva, iva]);
+
+    const shipping = useMemo(()=> {
+        return subtotal >= 2000.0 ? 0.0 : 220
+    }, [subtotal])
+
+    const total = useMemo(()=>{
+        return subtotal + shipping;
+    }, [subtotal, shipping])
+
     // useEffect(() => {
     //     //console.log(order)
     // }, [order]);
@@ -81,7 +124,10 @@ export default function PedidosPage() {
                     </h1>
                     <p className="text-gray-500 mt-1">
                         Realizado el {order.createdAt} &bull; <PedidosBadge key={order.id} estado={translateStatus(order.pedidoStatus)}/>
+                        {order.fecha_envio? <FechaEntregaComponent fechaEntrega={order.fecha_envio?order.fecha_envio : ""}/>:null}
                         {/*<span className="font-semibold text-blue-600">{translateStatus(order.pedidoStatus)}</span>*/}
+                        <br/>
+                        <strong>*Todos los pedidos tienen un tiempo de entrega de 1 a 5 dias hábiles.</strong>
                     </p>
                 </div>
 
@@ -90,10 +136,10 @@ export default function PedidosPage() {
                     <div className="lg:col-span-2 space-y-8">
                         <PedidosProductList products={order.pedidoDetails} />
                         <PaymentSummary summary={{
-                            shipping: 500,
-                            tax: order.pedidoDetails.reduce((previousValue: number, currentValue: PedidoDetail)=> previousValue + currentValue.static_price, 0) * 0.16,
-                            subtotal: order.pedidoDetails.reduce((previousValue: number, currentValue: PedidoDetail)=> previousValue + currentValue.static_price, 0),
-                            total: order.pedidoDetails.reduce((previousValue: number, currentValue: PedidoDetail)=> previousValue + currentValue.static_price, 0) * 1.16 + 500
+                            shipping: shipping,
+                            tax: iva,
+                            subtotal: precioSinIva,
+                            total: total
                         }} />
                     </div>
 
