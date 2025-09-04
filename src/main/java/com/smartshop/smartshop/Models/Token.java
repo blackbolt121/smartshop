@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDateTime;
@@ -26,7 +24,6 @@ public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)  // Ensure your DB supports UUID generation
     private String id;
-
 
     @Column(unique = true, length = 768)  // Token should be unique
     private String token;
